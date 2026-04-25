@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinancIO - Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header-->
+    <header class="header">
+        <h1>FinancIO - Dashboard</h1>        
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+
+        <!-- Headear usuario -->
+        <section class="dashboard-header">
+            <div>
+                <h2 class="dashboard_title">Hola Admin</h2>
+                <p class="dashboard_saldo">Saldo: $12,500.00</p>
+            </div>
+        </section>
+
+        <!-- Tarjeta grafica -->
+        <section class="card card--chart">
+            <h3 class="card_title">Gastos por categor&iacute;a</h3>
+            <div class="chart-container">
+                <canvas id="graficaGastos"></canvas>
+            </div>
+        </section>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script>
+            const ctx = document.getElementById('graficaGastos');
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Comida', 'Transporte', 'Entretenimiento'],
+                    datasets: [{
+                        data: [500, 300, 200],
+                        backgroundColor: ['#4CAF50', '#FF9800', '#2196F3']
+                    }]
+                }
+            });
+        </script>
+
+        <!-- Tarjeta tabla-->
+        <section class="card">
+            <div class="card_header">
+                <h3>&Uacute;ltimos movimientos</h3>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Catego&iacute;a</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>03/04/26</td>
+                        <td>Salario</td>
+                        <td class="amount positive">+$5000</td>
+                    </tr>
+                    <tr>
+                        <td>10/04/26</td>
+                        <td>Comida</td>
+                        <td class="amount negative">-$500</td>
+                    </tr>
+                    <tr>
+                        <td>14/04/26</td>
+                        <td>Transporte</td>
+                        <td class="amount negative">-$300</td>
+                    </tr>
+                    <tr>
+                        <td>23/04/26</td>
+                        <td>Entretenimiento</td>
+                        <td class="amount negative">-$200</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Boton flotante -->
+        <a href="gastos.html">
+            <button class="fab">+</button>
+        </a>
+    </main>
+</body>
+</html>

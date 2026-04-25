@@ -1,0 +1,305 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* VARIABLES */
+:root {
+    --color-primary: #162577;
+    --color-secondary: #1DC4D4;
+    --color-bg: #FFFFFF;
+
+    --color-text: #1A1A1A;
+    --color-muted: #6b7280;
+
+    --color-card: #f9fafb;
+    --color-border: #e5e7eb;
+
+
+    --font-main: 'Segoe UI', sans-serif;
+}
+
+/* -------------- HOME --------------*/
+
+/* GLOBAL */
+body {
+    font-family: var(--font-main);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+}
+
+/* HEADER */
+.header {
+    background: var(--color-primary);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+}
+
+/* NAV */
+.nav {
+    background: var(--color-secondary);
+    display: flex;
+    align-items: center; 
+}
+
+.nav__list {
+    display: flex;
+    gap: 1.5;
+    justify-content: center;
+    list-style: none;
+}
+
+.nav_link{
+    text-decoration: none;
+    color: var(--color-muted);
+    font-weight: 500;
+    position: relative;
+    padding: 0.3rem;
+}
+
+.nav__link:hover {
+    color: var(--color-primary);
+}
+
+.nav__link.active {
+    color: var(--color-primary);
+}
+
+.nav__link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 0%;
+    height: 2px;
+    background: var(--color-secondary);
+    transition: 0.3s;
+}
+
+.nav__link:hover::after,
+.nav__link.active::after {
+    width: 100%;
+}
+
+.nav__list li a {
+    display: block;
+    padding: 1rem;
+    color: white;
+    text-decoration: none;
+}
+
+.nav__list li a:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* MAIN */
+.main {
+    padding: 2rem;
+}
+
+/* HERO */
+.hero {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.image_logo{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* CARDS */
+.features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.footer{
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center;     /* Centra verticalmente (opcional) */
+}
+
+/* -------------- DASHBOARD --------------*/
+/* DASHBOARD */
+.dashboard {
+    padding: 1.5rem;
+}
+
+/* HEADER */
+.dashboard__header {
+    margin-bottom: 1.5rem;
+}
+
+.dashboard__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.dashboard__saldo {
+    font-size: 1.2rem;
+    color: var(--color-primary);
+    margin-top: 0.3rem;
+}
+
+/* CARD */
+.card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.card__header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+/* CHART */
+.chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: 250px;
+    margin: 0 auto;
+}
+
+/* TABLE */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    text-align: left;
+    padding: 0.5rem 0;
+    color: #777;
+    font-weight: 500;
+}
+
+.table td {
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* MONTOS */
+.amount {
+    font-weight: bold;
+}
+
+.amount.negative {
+    color: #E53935;
+}
+
+.amount.positive {
+    color: #43A047;
+}
+
+/* LINK */
+.link {
+    font-size: 0.9rem;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+/* FAB (Boton Flotante) */
+.fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+
+/* -------------- GASTOS --------------*/
+.form-page {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.form-card {
+    width: 100%;
+    max-width: 500px;
+}
+
+.form-title {
+    margin-bottom: 1.5rem;
+}
+
+/* GRUPOS */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+}
+
+/* INPUTS */
+input, select {
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* RADIO */
+.radio-group {
+    display: flex;
+    gap: 1rem;
+}
+
+/* BOTON */
+.btn-primary {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+/* ERRORES */
+.error-message {
+    color: #E53935;
+    font-size: 0.8rem;
+    height: 14px;
+}
+
+/* INPUT ERROR */
+.input-error {
+    border-color: #E53935;
+}
