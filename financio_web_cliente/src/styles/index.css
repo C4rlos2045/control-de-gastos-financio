@@ -1,6 +1,7 @@
 /*IMPORTACIONES*/
 @import './navbar.css';
 @import './login.css';
+@import './dashboard.css';
 
 /* RESET */
 * {
