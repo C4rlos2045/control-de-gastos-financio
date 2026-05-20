@@ -69,6 +69,15 @@ function ExpenseChart() {
     ]
     };
 
+    const options = {
+        responsive: true,
+        plugins: {
+        legend: {
+        position: 'bottom'
+    }
+    }
+    };
+
     return (
 
     <section className="card">
@@ -84,7 +93,7 @@ function ExpenseChart() {
         }}
         >
 
-        <Doughnut data={data} />
+        <Doughnut data={data} options={options} />
 
         </div>
 

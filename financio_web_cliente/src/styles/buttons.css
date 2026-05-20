@@ -1,0 +1,35 @@
+.btn-primary {
+
+    background:
+    var(--color-primary);
+
+    color: white;
+
+    padding:
+    0.9rem 1.2rem;
+
+    border-radius:
+    10px;
+
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+
+    background:
+    #1c328f;
+}
+
+.btn-secondary {
+
+    background:
+    var(--color-secondary);
+
+    color: white;
+
+    padding:
+    0.9rem 1.2rem;
+
+    border-radius:
+    10px;
+}

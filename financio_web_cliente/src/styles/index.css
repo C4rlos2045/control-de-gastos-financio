@@ -2,6 +2,8 @@
 @import './navbar.css';
 @import './login.css';
 @import './dashboard.css';
+@import './buttons.css';
+@import './alert.css';
 
 /* RESET */
 * {
@@ -12,18 +14,103 @@
 
 /* VARIABLES */
 :root {
+
   --color-primary: #162577;
   --color-secondary: #1dc4d4;
-  --color-bg: #ffffff;
 
-  --color-text: #1a1a1a;
+  --color-bg: #f5f7fb;
+
+  --color-white: #ffffff;
+
+  --color-text: #1f2937;
+
   --color-muted: #6b7280;
 
-  --font-main: 'Segoe UI', sans-serif;
+  --color-border: #e5e7eb;
+
+  --shadow-sm:
+    0 2px 8px rgba(0,0,0,0.05);
+
+  --shadow-md:
+    0 6px 18px rgba(0,0,0,0.08);
+
+  --radius-md: 14px;
+
+  --transition:
+    all 0.3s ease;
 }
 
+/* ESTILOS GLOBALES */
+
 body {
-  font-family: var(--font-main);
-  background: var(--color-bg);
-  color: var(--color-text);
+
+  font-family:
+    'Segoe UI',
+    sans-serif;
+
+  background:
+    var(--color-bg);
+
+  color:
+    var(--color-text);
+
+  min-height: 100vh;
+}
+
+/* BOTONES */
+
+button {
+
+  border: none;
+
+  cursor: pointer;
+
+  transition:
+    var(--transition);
+}
+
+button:hover {
+
+  transform:
+    translateY(-2px);
+}
+
+/* ENTRADAS */
+
+input,
+select {
+
+  width: 100%;
+
+  padding: 0.9rem 1rem;
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius:
+    10px;
+
+  outline: none;
+
+  transition:
+    var(--transition);
+}
+
+input:focus,
+select:focus {
+
+  border-color:
+    var(--color-secondary);
+
+  box-shadow:
+    0 0 0 3px rgba(29,196,212,0.15);
+}
+
+/* INTERACCIONES */
+.card,
+button,
+input {
+
+  transition:
+    all 0.25s ease;
 }

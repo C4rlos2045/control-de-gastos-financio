@@ -1,0 +1,22 @@
+.alert {
+
+    padding: 1rem;
+
+    border-radius: 10px;
+
+    font-weight: 500;
+}
+
+.alert--error {
+
+    background: #fee2e2;
+
+    color: #dc2626;
+}
+
+.alert--success {
+
+    background: #dcfce7;
+
+    color: #15803d;
+}

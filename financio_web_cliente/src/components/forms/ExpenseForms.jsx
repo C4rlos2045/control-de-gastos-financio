@@ -115,7 +115,7 @@ function ExpenseForm() {
 
         </select>
 
-        <button type="submit">
+        <button type="submit" className="btn-primary">
             Guardar
         </button>
 
