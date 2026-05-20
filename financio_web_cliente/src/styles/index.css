@@ -1,0 +1,27 @@
+/*IMPORTACIONES*/
+@import './navbar.css';
+
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* VARIABLES */
+:root {
+  --color-primary: #162577;
+  --color-secondary: #1dc4d4;
+  --color-bg: #ffffff;
+
+  --color-text: #1a1a1a;
+  --color-muted: #6b7280;
+
+  --font-main: 'Segoe UI', sans-serif;
+}
+
+body {
+  font-family: var(--font-main);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
