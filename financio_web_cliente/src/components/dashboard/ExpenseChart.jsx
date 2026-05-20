@@ -5,7 +5,13 @@ import {
     Legend
 } from 'chart.js';
 
-import { Doughnut } from 'react-chartjs-2';
+import {
+    Doughnut
+} from 'react-chartjs-2';
+
+import {
+    useFinance
+} from '../../context/FinanceContext';
 
 ChartJS.register(
     ArcElement,
@@ -15,26 +21,49 @@ ChartJS.register(
 
 function ExpenseChart() {
 
+    const {
+    movimientos
+    } = useFinance();
+
+    const ingresos =
+    movimientos
+        .filter(
+        mov => mov.tipo === 'ingreso'
+        )
+        .reduce(
+        (acc, mov) =>
+            acc + mov.monto,
+        0
+        );
+
+    const gastos =
+    movimientos
+        .filter(
+        mov => mov.tipo === 'gasto'
+        )
+        .reduce(
+        (acc, mov) =>
+            acc + mov.monto,
+        0
+        );
+
     const data = {
 
     labels: [
-        'Comida',
-        'Transporte',
-        'Servicios',
-        'Ocio',
-        'Otros'
+        'Ingresos',
+        'Gastos'
     ],
 
     datasets: [
         {
-        data: [3000, 1500, 2500, 1000, 2000],
+        data: [
+            ingresos,
+            gastos
+        ],
 
         backgroundColor: [
-            '#162577',
             '#1dc4d4',
-            '#4f46e5',
-            '#06b6d4',
-            '#f59e0b'
+            '#162577'
         ]
         }
     ]
@@ -44,7 +73,9 @@ function ExpenseChart() {
 
     <section className="card">
 
-        <h3>Distribución de gastos</h3>
+        <h3>
+        Balance financiero
+        </h3>
 
         <div
         style={{

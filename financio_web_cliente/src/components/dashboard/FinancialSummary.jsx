@@ -1,33 +1,61 @@
 import BalanceCard from './BalanceCard';
 
+import {
+  useFinance
+} from '../../context/FinanceContext';
+
 function FinancialSummary() {
 
-  // DATOS SIMULADOS
-    const balance = 15000;
-    const ingresos = 25000;
-    const gastos = 10000;
+  const {
+    movimientos
+  } = useFinance();
 
-    return (
+  const ingresos =
+    movimientos
+      .filter(
+        mov => mov.tipo === 'ingreso'
+      )
+      .reduce(
+        (acc, mov) =>
+          acc + mov.monto,
+        0
+      );
+
+  const gastos =
+    movimientos
+      .filter(
+        mov => mov.tipo === 'gasto'
+      )
+      .reduce(
+        (acc, mov) =>
+          acc + mov.monto,
+        0
+      );
+
+  const balance =
+    ingresos - gastos;
+
+  return (
 
     <section className="dashboard__cards">
 
-        <BalanceCard
+      <BalanceCard
         titulo="Balance"
         monto={balance}
-        />
+      />
 
-        <BalanceCard
+      <BalanceCard
         titulo="Ingresos"
         monto={ingresos}
-        />
+      />
 
-        <BalanceCard
+      <BalanceCard
         titulo="Gastos"
         monto={gastos}
-        />
+      />
 
     </section>
-    );
+  );
 }
 
 export default FinancialSummary;

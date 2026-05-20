@@ -1,38 +1,36 @@
+import {
+    useFinance
+} from '../../context/FinanceContext';
+
 function MovementTable() {
 
-    const movimientos = [
-    {
-        id: 1,
-        descripcion: 'Supermercado',
-        monto: 1200
-    },
-
-    {
-        id: 2,
-        descripcion: 'Gasolina',
-        monto: 800
-    },
-
-    {
-        id: 3,
-        descripcion: 'Internet',
-        monto: 500
-    }
-    ];
+    const {
+    movimientos,
+    eliminarMovimiento
+    } = useFinance();
 
     return (
 
     <section className="card">
 
-        <h3>Movimientos recientes</h3>
+        <h3>
+        Movimientos recientes
+        </h3>
 
         <table width="100%">
 
         <thead>
 
             <tr>
+
             <th>Descripción</th>
+
+            <th>Tipo</th>
+
             <th>Monto</th>
+
+            <th>Acción</th>
+
             </tr>
 
         </thead>
@@ -44,9 +42,31 @@ function MovementTable() {
 
                 <tr key={mov.id}>
 
-                <td>{mov.descripcion}</td>
+                <td>
+                    {mov.descripcion}
+                </td>
 
-                <td>${mov.monto}</td>
+                <td>
+                    {mov.tipo}
+                </td>
+
+                <td>
+                    ${mov.monto}
+                </td>
+
+                <td>
+
+                    <button
+                    onClick={() =>
+                        eliminarMovimiento(
+                        mov.id
+                        )
+                    }
+                    >
+                    Eliminar
+                    </button>
+
+                </td>
 
                 </tr>
             ))
