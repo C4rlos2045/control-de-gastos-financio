@@ -22,3 +22,8 @@
   text-decoration: none;
   color: var(--color-text);
 }
+
+.navbar__nav a.active {
+  color: var(--color-primary);
+  font-weight: bold;
+}

@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 function Navbar() {
 return (
     <header className="navbar">
@@ -7,9 +9,10 @@ return (
     </div>
 
     <nav className="navbar__nav">
-        <a href="#">Inicio</a>
-        <a href="#">Dashboard</a>
-        <a href="#">Movimientos</a>
+        <NavLink to="/">Inicio</NavLink>
+        <NavLink to="/dashboard">Dashboard</NavLink>
+        <NavLink to="/login">Iniciar sesión</NavLink>
+        <NavLink to="/register">Registrarse</NavLink>
     </nav>
     </header>
 );
