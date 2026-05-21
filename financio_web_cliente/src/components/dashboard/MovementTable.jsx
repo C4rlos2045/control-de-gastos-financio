@@ -27,6 +27,10 @@ function MovementTable() {
 
             <th>Tipo</th>
 
+            <th>Categoría</th>
+
+            <th>Fecha</th>
+
             <th>Monto</th>
 
             <th>Acción</th>
@@ -49,6 +53,15 @@ function MovementTable() {
                 <td>
                     {mov.tipo}
                 </td>
+
+                <td>
+                    {mov.categoria}
+                </td>
+
+                <td>
+                    {mov.fecha}
+                </td>
+
 
                 <td>
                     ${mov.monto}

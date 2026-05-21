@@ -21,84 +21,114 @@ ChartJS.register(
 
 function ExpenseChart() {
 
-    const {
+  const {
     movimientos
-    } = useFinance();
+  } = useFinance();
 
-    const ingresos =
-    movimientos
-        .filter(
-        mov => mov.tipo === 'ingreso'
-        )
-        .reduce(
-        (acc, mov) =>
-            acc + mov.monto,
-        0
-        );
+  // FILTRAR SOLO GASTOS
+  const gastos =
+    movimientos.filter(
+      mov => mov.tipo === 'gasto'
+    );
 
-    const gastos =
-    movimientos
-        .filter(
-        mov => mov.tipo === 'gasto'
-        )
-        .reduce(
-        (acc, mov) =>
-            acc + mov.monto,
-        0
-        );
+  // AGRUPAR POR CATEGORIA
+  const gastosPorCategoria = {};
 
-    const data = {
+  gastos.forEach((mov) => {
 
-    labels: [
-        'Ingresos',
-        'Gastos'
-    ],
+    if (
+      gastosPorCategoria[mov.categoria]
+    ) {
+
+      gastosPorCategoria[mov.categoria] +=
+        mov.monto;
+
+    } else {
+
+      gastosPorCategoria[mov.categoria] =
+        mov.monto;
+    }
+  });
+
+  // LABELS
+  const labels =
+    Object.keys(gastosPorCategoria);
+
+  // DATOS
+  const dataValores =
+    Object.values(gastosPorCategoria);
+
+  const data = {
+
+    labels,
 
     datasets: [
-        {
-        data: [
-            ingresos,
-            gastos
-        ],
+      {
+        data: dataValores,
 
         backgroundColor: [
-            '#1dc4d4',
-            '#162577'
-        ]
-        }
+          '#162577',
+          '#1dc4d4',
+          '#4f46e5',
+          '#06b6d4',
+          '#8b5cf6',
+          '#0ea5e9',
+          '#14b8a6'
+        ],
+
+        borderWidth: 2
+      }
     ]
-    };
+  };
 
-    const options = {
-        responsive: true,
-        plugins: {
-        legend: {
+  const options = {
+
+    responsive: true,
+
+    plugins: {
+
+      legend: {
+
         position: 'bottom'
+      }
     }
-    }
-    };
+  };
 
-    return (
+  return (
 
     <section className="card">
 
-        <h3>
-        Balance financiero
-        </h3>
+      <h3>
+        Gastos por categoría
+      </h3>
 
-        <div
-        style={{
-            width: '350px',
-            margin: '0 auto'
-        }}
-        >
+      {
+        gastos.length === 0 ? (
 
-        <Doughnut data={data} options={options} />
+          <p>
+            No hay gastos registrados
+          </p>
 
-        </div>
+        ) : (
+
+          <div
+            style={{
+              width: '350px',
+              margin: '0 auto'
+            }}
+          >
+
+            <Doughnut
+              data={data}
+              options={options}
+            />
+
+          </div>
+        )
+      }
 
     </section>
-    );
+  );
 }
 
 export default ExpenseChart;

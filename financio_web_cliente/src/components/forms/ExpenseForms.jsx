@@ -6,6 +6,8 @@ import {
     useFinance
 } from '../../context/FinanceContext';
 
+import {categorias} from '../../utils/categories';
+
 function ExpenseForm() {
 
     const {
@@ -20,6 +22,12 @@ function ExpenseForm() {
 
     const [tipo,
     setTipo] = useState('gasto');
+
+    const [categoria,
+    setCategoria] = useState('Comida');
+
+    const [fecha,
+    setFecha] =useState('');
 
     const [error,
     setError] = useState('');
@@ -55,12 +63,15 @@ function ExpenseForm() {
     agregarMovimiento({
         descripcion,
         monto: Number(monto),
-        tipo
+        tipo,
+        categoria,
+        fecha: fecha || new Date().toISOString()
     });
 
     // LIMPIAR
     setDescripcion('');
     setMonto('');
+    setFecha('');
     };
 
     return (
@@ -114,6 +125,35 @@ function ExpenseForm() {
             </option>
 
         </select>
+
+        <select
+            value={categoria}
+            onChange={(e) =>
+            setCategoria(e.target.value)
+            }
+        >
+
+        {
+        categorias[tipo].map((cat) => (
+
+        <option
+        key={cat}
+        value={cat}
+        >
+        {cat}
+        </option>
+        ))
+        }
+
+        </select>
+
+        <input
+        type="date"
+        value={fecha}
+        onChange={(e) =>
+        setFecha(e.target.value)
+        }
+        /> 
 
         <button type="submit" className="btn-primary">
             Guardar
