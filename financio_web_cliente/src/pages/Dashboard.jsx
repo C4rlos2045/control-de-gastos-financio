@@ -4,15 +4,33 @@ import ExpenseChart from '../components/dashboard/ExpenseChart';
 import MovementTable from '../components/dashboard/MovementTable';
 import ExpenseForm from '../components/forms/ExpenseForms';
 import QuickActions from '../components/dashboard/QuickActions';
+import ExpenseFilter from '../components/dashboard/ExpenseFilters';
+
+import {useState} from 'react';
 
 function Dashboard() {
+  const [filtroTexto, setFiltroTexto] = useState('');
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
+
   return (
 
     <main className="dashboard">
       <DashboardHeader />
       <FinancialSummary />
       <ExpenseForm />
-      <ExpenseChart />
+      <ExpenseFilter
+        filtroTexto={filtroTexto}
+        setFiltroTexto={setFiltroTexto}
+        categoriaSeleccionada={categoriaSeleccionada}
+        setCategoriaSeleccionada={setCategoriaSeleccionada}
+      />
+      <ExpenseChart
+        filtroTexto={filtroTexto}
+
+        categoriaSeleccionada={
+        categoriaSeleccionada
+        }
+      />
       <MovementTable />
       <QuickActions />
     </main>

@@ -19,7 +19,7 @@ ChartJS.register(
     Legend
 );
 
-function ExpenseChart() {
+function ExpenseChart({filtroTexto,categoriaSeleccionada}) {
 
   const {
     movimientos
@@ -27,9 +27,31 @@ function ExpenseChart() {
 
   // FILTRAR SOLO GASTOS
   const gastos =
-    movimientos.filter(
-      mov => mov.tipo === 'gasto'
+  movimientos.filter((mov) => {
+
+    const esGasto =
+      mov.tipo === 'gasto';
+
+    const coincideTexto =
+      mov.descripcion
+        .toLowerCase()
+        .includes(
+          filtroTexto.toLowerCase()
+        );
+
+    const coincideCategoria =
+
+      categoriaSeleccionada === '' ||
+
+      mov.categoria ===
+      categoriaSeleccionada;
+
+    return (
+      esGasto &&
+      coincideTexto &&
+      coincideCategoria
     );
+  });
 
   // AGRUPAR POR CATEGORIA
   const gastosPorCategoria = {};

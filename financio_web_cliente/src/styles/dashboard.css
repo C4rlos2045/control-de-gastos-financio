@@ -55,6 +55,16 @@
     font-weight: bold;
 }
 
+.filters {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(220px, 1fr));
+
+  gap: 1rem;
+}
+
 @media (max-width: 768px) {
 
     .dashboard {
