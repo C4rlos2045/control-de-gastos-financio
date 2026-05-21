@@ -107,10 +107,7 @@ select:focus {
 }
 
 /* INTERACCIONES */
-.card,
-button,
-input {
-
+.card,button,input {
   transition:
     all 0.25s ease;
 }

@@ -27,7 +27,7 @@
 
 .navbar__nav {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .navbar__nav a {
@@ -39,18 +39,29 @@
 }
 
 .navbar__nav a.active {
+  color:
+    var(--color-primary)
+}
+
+.navbar__nav a::after {
+
   content: '';
+
   position: absolute;
+
   left: 0;
+
   bottom: -6px;
+
   width: 0;
+
   height: 2px;
+
   background:
     var(--color-secondary);
+
   transition:
     var(--transition);
-  color: var(--color-primary);
-  font-weight: bold;
 }
 
 .navbar__nav a:hover::after {

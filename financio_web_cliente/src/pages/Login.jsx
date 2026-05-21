@@ -1,18 +1,24 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useState} from 'react';
+import {useNavigate, Link} from 'react-router-dom';
+import {useAuth} from '../context/AuthContext';
 
-import { useAuth } from '../context/AuthContext';
 
 function Login() {
 
-    const [correo, setCorreo] = useState('');
-    const [password, setPassword] = useState('');
-
-    const [error, setError] = useState('');
-
-    const { login } = useAuth();
-
     const navigate = useNavigate();
+
+    const {
+    login
+    } = useAuth();
+
+    const [correo,
+    setCorreo] = useState('');
+
+    const [password,
+    setPassword] = useState('');
+
+    const [error,
+    setError] = useState('');
 
     const handleSubmit = (e) => {
 
@@ -22,14 +28,21 @@ function Login() {
 
     // VALIDACION
     if (!correo || !password) {
-        setError('Todos los campos son obligatorios');
+
+        setError(
+        'Todos los campos son obligatorios'
+        );
+
         return;
     }
 
-    const autenticado = login(correo, password);
+    const resultado =
+        login(correo, password);
 
-    if (!autenticado) {
-        setError('Credenciales incorrectas');
+    if (!resultado.ok) {
+
+        setError(resultado.mensaje);
+
         return;
     }
 
@@ -49,7 +62,9 @@ function Login() {
 
         {
             error &&
-            <p className="error">{error}</p>
+            <p className="error">
+            {error}
+            </p>
         }
 
         <input
@@ -70,14 +85,24 @@ function Login() {
             }
         />
 
-        <button type="submit">
+        <button
+            type="submit"
+            className="btn-primary"
+        >
             Entrar
         </button>
+
+        <p className="auth-link">
+            ¿No tienes cuenta?
+            <Link to="/register">
+            Regístrate
+            </Link>
+        </p>
 
         </form>
 
     </main>
-    );
+  );
 }
 
 export default Login;

@@ -30,3 +30,14 @@
 .error {
     color: red;
 }
+
+.success {
+
+    color: #15803d;
+
+    background: #dcfce7;
+
+    padding: 0.8rem;
+
+    border-radius: 8px;
+}
