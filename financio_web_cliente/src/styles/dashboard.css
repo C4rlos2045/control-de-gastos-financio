@@ -298,3 +298,115 @@
     width: 100%;
   }
 }
+
+/* MOVEMENTS TABLE */
+
+.movements-card {
+  background: white;
+  border-radius: 2rem;
+  padding: 1.6rem 2rem;
+  box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+}
+
+.movements-card__header {
+  margin-bottom: 1.3rem;
+}
+
+.movements-card__label {
+  display: inline-block;
+  margin-bottom: 0.4rem;
+
+  color: var(--color-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.movements-card h3 {
+  color: var(--color-primary);
+  font-size: 1.3rem;
+}
+
+.movements-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.movements-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 720px;
+}
+
+.movements-table th,
+.movements-table td {
+  padding: 0.9rem 0.6rem;
+  border-bottom: 1px solid #e2edf5;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.movements-table th {
+  color: #4b6e8a;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.movements-table tr:hover {
+  background: #f8fafd;
+}
+
+.movements-table__amount {
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.movements-table__empty {
+  text-align: center;
+  color: var(--color-muted);
+  padding: 2rem !important;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.badge--income {
+  background: #dff0e4;
+  color: #18603a;
+}
+
+.badge--expense {
+  background: #ffe6e5;
+  color: #b13e3e;
+}
+
+.btn-delete {
+  background: transparent;
+  border: none;
+  color: #b91c1c;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  color: #7f1d1d;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .movements-card {
+    padding: 1.3rem;
+  }
+
+  .movements-table {
+    font-size: 0.82rem;
+  }
+}

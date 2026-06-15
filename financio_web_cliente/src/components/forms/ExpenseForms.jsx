@@ -50,9 +50,6 @@ function ExpenseForm() {
     <section className="movement-form-card">
       <div className="movement-form-card__header">
         <div>
-          <span className="movement-form-card__label">
-            Registro financiero
-          </span>
 
           <h3>
             Nuevo movimiento
