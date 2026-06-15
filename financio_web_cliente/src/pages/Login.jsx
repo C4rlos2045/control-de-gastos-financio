@@ -1,107 +1,76 @@
-import {useState} from 'react';
-import {useNavigate, Link} from 'react-router-dom';
-import {useAuth} from '../context/AuthContext';
-
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import AuthLayout from '../layouts/AuthLayout';
 
 function Login() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-    const navigate = useNavigate();
+  const [correo, setCorreo] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-    const {
-    login
-    } = useAuth();
-
-    const [correo,
-    setCorreo] = useState('');
-
-    const [password,
-    setPassword] = useState('');
-
-    const [error,
-    setError] = useState('');
-
-    const handleSubmit = (e) => {
-
+  const handleSubmit = (e) => {
     e.preventDefault();
-
     setError('');
 
-    // VALIDACION
     if (!correo || !password) {
-
-        setError(
-        'Todos los campos son obligatorios'
-        );
-
-        return;
+      setError('Todos los campos son obligatorios');
+      return;
     }
 
-    const resultado =
-        login(correo, password);
+    const resultado = login(correo, password);
 
     if (!resultado.ok) {
-
-        setError(resultado.mensaje);
-
-        return;
+      setError(resultado.mensaje);
+      return;
     }
 
     navigate('/dashboard');
-    };
+  };
 
-    return (
+  return (
+    <AuthLayout
+      title="Iniciar sesión"
+    >
+      {error && (
+        <div className="auth-alert auth-alert--error">
+          {error}
+        </div>
+      )}
 
-    <main className="login">
-
-        <form
-        className="login__form"
-        onSubmit={handleSubmit}
-        >
-
-        <h1>Iniciar sesión</h1>
-
-        {
-            error &&
-            <p className="error">
-            {error}
-            </p>
-        }
-
-        <input
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <div className="auth-field">
+          <label>Correo electrónico</label>
+          <input
             type="email"
-            placeholder="Correo"
+            placeholder="usuario@ejemplo.com"
             value={correo}
-            onChange={(e) =>
-            setCorreo(e.target.value)
-            }
-        />
+            onChange={(e) => setCorreo(e.target.value)}
+          />
+        </div>
 
-        <input
+        <div className="auth-field">
+          <label>Contraseña</label>
+          <input
             type="password"
-            placeholder="Contraseña"
+            placeholder="********"
             value={password}
-            onChange={(e) =>
-            setPassword(e.target.value)
-            }
-        />
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
 
-        <button
-            type="submit"
-            className="btn-primary"
-        >
-            Entrar
+        <button type="submit" className="auth-button">
+          Entrar
         </button>
+      </form>
 
-        <p className="auth-link">
-            ¿No tienes cuenta?
-            <Link to="/register">
-            Regístrate
-            </Link>
-        </p>
-
-        </form>
-
-    </main>
+      <p className="auth-link">
+        ¿No tienes cuenta?
+        <Link to="/register"> Regístrate</Link>
+      </p>
+    </AuthLayout>
   );
 }
 

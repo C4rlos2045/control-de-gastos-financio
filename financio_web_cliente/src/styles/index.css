@@ -5,6 +5,7 @@
 @import './footer.css';
 @import './buttons.css';
 @import './alert.css';
+@import './auth.css';
 
 /* RESET */
 * {
