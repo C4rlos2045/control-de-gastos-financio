@@ -1,168 +1,143 @@
-import {
-    useState
-} from 'react';
-
-import {
-    useFinance
-} from '../../context/FinanceContext';
-
-import {categorias} from '../../utils/categories';
+import { useState } from 'react';
+import { useFinance } from '../../context/FinanceContext';
+import { categorias } from '../../utils/categories';
 
 function ExpenseForm() {
+  const { agregarMovimiento } = useFinance();
 
-    const {
-    agregarMovimiento
-    } = useFinance();
+  const [descripcion, setDescripcion] = useState('');
+  const [monto, setMonto] = useState('');
+  const [tipo, setTipo] = useState('gasto');
+  const [categoria, setCategoria] = useState('Comida');
+  const [fecha, setFecha] = useState('');
+  const [error, setError] = useState('');
 
-    const [descripcion,
-    setDescripcion] = useState('');
+  const handleTipoChange = (nuevoTipo) => {
+    setTipo(nuevoTipo);
+    setCategoria(categorias[nuevoTipo][0]);
+  };
 
-    const [monto,
-    setMonto] = useState('');
-
-    const [tipo,
-    setTipo] = useState('gasto');
-
-    const [categoria,
-    setCategoria] = useState('Comida');
-
-    const [fecha,
-    setFecha] =useState('');
-
-    const [error,
-    setError] = useState('');
-
-    const handleSubmit = (e) => {
-
+  const handleSubmit = (e) => {
     e.preventDefault();
-
     setError('');
 
-    // VALIDACIONES
-    if (
-        !descripcion ||
-        !monto
-    ) {
-
-        setError(
-        'Todos los campos son obligatorios'
-        );
-
-        return;
+    if (!descripcion.trim() || !monto) {
+      setError('Todos los campos son obligatorios');
+      return;
     }
 
-    if (monto <= 0) {
-
-        setError(
-        'El monto debe ser mayor a cero'
-        );
-
-        return;
+    if (Number(monto) <= 0) {
+      setError('El monto debe ser mayor a cero');
+      return;
     }
 
     agregarMovimiento({
-        descripcion,
-        monto: Number(monto),
-        tipo,
-        categoria,
-        fecha: fecha || new Date().toISOString()
+      descripcion: descripcion.trim(),
+      monto: Number(monto),
+      tipo,
+      categoria,
+      fecha: fecha || new Date().toISOString()
     });
 
-    // LIMPIAR
     setDescripcion('');
     setMonto('');
+    setTipo('gasto');
+    setCategoria('Comida');
     setFecha('');
-    };
+  };
 
-    return (
+  return (
+    <section className="movement-form-card">
+      <div className="movement-form-card__header">
+        <div>
+          <span className="movement-form-card__label">
+            Registro financiero
+          </span>
 
-    <section className="card">
+          <h3>
+            Nuevo movimiento
+          </h3>
+        </div>
+      </div>
 
-        <h3>
-        Nuevo movimiento
-        </h3>
+      {error && (
+        <div className="form-alert form-alert--error">
+          {error}
+        </div>
+      )}
 
-        {
-        error &&
-        <p className="error">
-            {error}
-        </p>
-        }
-
-        <form onSubmit={handleSubmit}>
-
-        <input
+      <form
+        className="movement-form"
+        onSubmit={handleSubmit}
+      >
+        <div className="form-field">
+          <label>Descripción</label>
+          <input
             type="text"
-            placeholder="Descripción"
+            placeholder="Ej. Compra de comida"
             value={descripcion}
-            onChange={(e) =>
-            setDescripcion(e.target.value)
-            }
-        />
+            onChange={(e) => setDescripcion(e.target.value)}
+          />
+        </div>
 
-        <input
+        <div className="form-field">
+          <label>Monto</label>
+          <input
             type="number"
-            placeholder="Monto"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
             value={monto}
-            onChange={(e) =>
-            setMonto(e.target.value)
-            }
-        />
+            onChange={(e) => setMonto(e.target.value)}
+          />
+        </div>
 
-        <select
+        <div className="form-field">
+          <label>Tipo</label>
+          <select
             value={tipo}
-            onChange={(e) =>
-            setTipo(e.target.value)
-            }
-        >
+            onChange={(e) => handleTipoChange(e.target.value)}
+          >
+            <option value="gasto">Gasto</option>
+            <option value="ingreso">Ingreso</option>
+          </select>
+        </div>
 
-            <option value="gasto">
-            Gasto
-            </option>
-
-            <option value="ingreso">
-            Ingreso
-            </option>
-
-        </select>
-
-        <select
+        <div className="form-field">
+          <label>Categoría</label>
+          <select
             value={categoria}
-            onChange={(e) =>
-            setCategoria(e.target.value)
-            }
+            onChange={(e) => setCategoria(e.target.value)}
+          >
+            {categorias[tipo].map((cat) => (
+              <option
+                key={cat}
+                value={cat}
+              >
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-field">
+          <label>Fecha</label>
+          <input
+            type="date"
+            value={fecha}
+            onChange={(e) => setFecha(e.target.value)}
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="btn-save-movement"
         >
-
-        {
-        categorias[tipo].map((cat) => (
-
-        <option
-        key={cat}
-        value={cat}
-        >
-        {cat}
-        </option>
-        ))
-        }
-
-        </select>
-
-        <input
-        type="date"
-        value={fecha}
-        onChange={(e) =>
-        setFecha(e.target.value)
-        }
-        /> 
-
-        <button type="submit" className="btn-primary">
-            Guardar
+          Guardar movimiento
         </button>
-
-        </form>
-
+      </form>
     </section>
-    );
+  );
 }
 
 export default ExpenseForm;
