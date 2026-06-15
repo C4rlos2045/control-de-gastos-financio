@@ -10,6 +10,7 @@ import {useState} from 'react';
 function Dashboard() {
   const [filtroTexto, setFiltroTexto] = useState('');
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
+  const [tipoSeleccionado, setTipoSeleccionado] = useState('');
 
   return (
 
@@ -22,13 +23,13 @@ function Dashboard() {
         setFiltroTexto={setFiltroTexto}
         categoriaSeleccionada={categoriaSeleccionada}
         setCategoriaSeleccionada={setCategoriaSeleccionada}
+        tipoSeleccionado={tipoSeleccionado}
+        setTipoSeleccionado={setTipoSeleccionado}
       />
       <ExpenseChart
         filtroTexto={filtroTexto}
-
-        categoriaSeleccionada={
-        categoriaSeleccionada
-        }
+        categoriaSeleccionada={categoriaSeleccionada}
+        tipoSeleccionado={tipoSeleccionado}
       />
       <MovementTable />
     </main>

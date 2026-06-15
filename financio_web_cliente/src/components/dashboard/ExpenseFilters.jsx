@@ -1,68 +1,59 @@
-import {
-  categorias
-} from '../../utils/categories';
+import { categorias } from '../../utils/categories';
 
 function ExpenseFilters({
-
   filtroTexto,
   setFiltroTexto,
-
   categoriaSeleccionada,
   setCategoriaSeleccionada
 }) {
-
   return (
+    <section className="filters-card">
+      <div className="filters-card__header">
+        <div>
+          <h3>
+            Filtrar movimientos
+          </h3>
+        </div>
+      </div>
 
-    <section className="card">
+      <div className="filters-grid">
+        <div className="filter-field filter-field--search">
+          <label>Buscar movimiento</label>
 
-      <h3>
-        Filtrar gastos
-      </h3>
+          <input
+            type="text"
+            placeholder="Ej. comida, transporte..."
+            value={filtroTexto}
+            onChange={(e) =>
+              setFiltroTexto(e.target.value)
+            }
+          />
+        </div>
 
-      <div className="filters">
+        <div className="filter-field">
+          <label>Categoría</label>
 
-        {/* BUSCADOR */}
+          <select
+            value={categoriaSeleccionada}
+            onChange={(e) =>
+              setCategoriaSeleccionada(e.target.value)
+            }
+          >
+            <option value="">
+              Todas las categorías
+            </option>
 
-        <input
-          type="text"
-          placeholder="Buscar movimiento..."
-          value={filtroTexto}
-          onChange={(e) =>
-            setFiltroTexto(e.target.value)
-          }
-        />
-
-        {/* CATEGORIA */}
-
-        <select
-          value={categoriaSeleccionada}
-          onChange={(e) =>
-            setCategoriaSeleccionada(
-              e.target.value
-            )
-          }
-        >
-
-          <option value="">
-            Todas las categorías
-          </option>
-
-          {
-            categorias.gasto.map((cat) => (
-
+            {categorias.gasto.map((cat) => (
               <option
                 key={cat}
                 value={cat}
               >
                 {cat}
               </option>
-            ))
-          }
-
-        </select>
-
+            ))}
+          </select>
+        </div>
       </div>
-
     </section>
   );
 }

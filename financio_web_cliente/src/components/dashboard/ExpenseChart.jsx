@@ -19,7 +19,11 @@ ChartJS.register(
     Legend
 );
 
-function ExpenseChart({filtroTexto,categoriaSeleccionada}) {
+function ExpenseChart({
+  filtroTexto,
+  categoriaSeleccionada,
+  tipoSeleccionado
+}) {
 
   const {
     movimientos
@@ -28,7 +32,6 @@ function ExpenseChart({filtroTexto,categoriaSeleccionada}) {
   // FILTRAR SOLO GASTOS
   const gastos =
   movimientos.filter((mov) => {
-
     const esGasto =
       mov.tipo === 'gasto';
 
@@ -40,16 +43,18 @@ function ExpenseChart({filtroTexto,categoriaSeleccionada}) {
         );
 
     const coincideCategoria =
-
       categoriaSeleccionada === '' ||
+      mov.categoria === categoriaSeleccionada;
 
-      mov.categoria ===
-      categoriaSeleccionada;
+    const coincideTipo =
+      tipoSeleccionado === '' ||
+      mov.tipo === tipoSeleccionado;
 
     return (
       esGasto &&
       coincideTexto &&
-      coincideCategoria
+      coincideCategoria &&
+      coincideTipo
     );
   });
 

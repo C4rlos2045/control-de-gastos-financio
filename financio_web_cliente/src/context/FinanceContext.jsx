@@ -60,13 +60,24 @@ export function FinanceProvider({
     );
     };
 
+    const actualizarMovimiento = (id, movimientoActualizado) => {
+    setMovimientos(
+        movimientos.map((mov) =>
+        mov.id === id
+            ? { ...mov, ...movimientoActualizado }
+            : mov
+        )
+    );
+    };
+
     return (
 
     <FinanceContext.Provider
         value={{
         movimientos,
         agregarMovimiento,
-        eliminarMovimiento
+        eliminarMovimiento,
+        actualizarMovimiento
         }}
     >
 
