@@ -1,23 +1,29 @@
 import { useAuth } from '../../context/AuthContext';
 
 function DashboardHeader() {
+  const { usuario, logout } = useAuth();
 
-    const { usuario, logout } = useAuth();
-
-    return (
-
-    <header className="card">
+  return (
+    <section className="dashboard-header">
+      <div className="dashboard-header__info">
 
         <h2>
-        Bienvenido {usuario?.nombre}
+          Bienvenido {usuario?.nombre || 'Usuario'}
         </h2>
 
-        <button onClick={logout}>
-        Cerrar sesión
-        </button>
+        <p>
+          Administra tus ingresos, gastos y movimientos desde un solo lugar.
+        </p>
+      </div>
 
-    </header>
-    );
+      <button
+        className="dashboard-header__logout"
+        onClick={logout}
+      >
+        Cerrar sesión
+      </button>
+    </section>
+  );
 }
 
 export default DashboardHeader;

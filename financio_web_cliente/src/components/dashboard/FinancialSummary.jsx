@@ -40,18 +40,21 @@ function FinancialSummary() {
     <section className="dashboard__cards">
 
       <BalanceCard
-        titulo="Balance"
-        monto={balance}
+      titulo="Balance total"
+      monto={balance}
+      tipo="balance"
       />
 
       <BalanceCard
         titulo="Ingresos"
         monto={ingresos}
+        tipo="income"
       />
 
       <BalanceCard
         titulo="Gastos"
         monto={gastos}
+        tipo="expense"
       />
 
     </section>
