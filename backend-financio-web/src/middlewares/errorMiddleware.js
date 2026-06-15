@@ -1,3 +1,5 @@
+import { env } from '../config/env.js';
+
 export const errorMiddleware = (
     error,
     req,
@@ -6,10 +8,15 @@ export const errorMiddleware = (
     ) => {
     console.error(error);
 
-    return res.status(error.statusCode || 500).json({
+    const statusCode = error.statusCode || 500;
+
+    return res.status(statusCode).json({
         ok: false,
         mensaje:
         error.message ||
-        'Error interno del servidor'
+        'Error interno del servidor',
+        ...(env.nodeEnv === 'development' && {
+        stack: error.stack
+        })
     });
 };
