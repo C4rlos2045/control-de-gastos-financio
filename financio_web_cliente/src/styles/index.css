@@ -6,6 +6,7 @@
 @import './buttons.css';
 @import './alert.css';
 @import './auth.css';
+@import './profile.css';
 
 /* RESET */
 * {

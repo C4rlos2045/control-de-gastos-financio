@@ -13,6 +13,7 @@ return (
         <NavLink to="/dashboard">Dashboard</NavLink>
         <NavLink to="/login">Iniciar sesión</NavLink>
         <NavLink to="/register">Registrarse</NavLink>
+        <NavLink to="/profile">Perfil</NavLink>
     </nav>
     </header>
 );

@@ -14,53 +14,41 @@ export function AuthProvider({
   const [usuario, setUsuario] =
     useState(null);
 
-  const [usuarios, setUsuarios] =
-    useState([]);
-
-  // CARGAR DATOS
-  useEffect(() => {
-
+  const [usuarios, setUsuarios] = useState(() => {
     const usuariosStorage =
       localStorage.getItem('usuarios');
 
-    // SI EXISTEN USUARIOS
     if (usuariosStorage) {
-
-      setUsuarios(
-        JSON.parse(usuariosStorage)
-      );
-
-    } else {
-
-      // USUARIO INICIAL
-      const usuarioInicial = [
-        {
-          id: 1,
-          nombre: 'Admin',
-          correo: 'admin@test.com',
-          password: '123456'
-        }
-      ];
-
-      setUsuarios(usuarioInicial);
-
-      localStorage.setItem(
-        'usuarios',
-        JSON.stringify(usuarioInicial)
-      );
+      return JSON.parse(usuariosStorage);
     }
 
-    // CARGAR SESION
+    const usuarioInicial = [
+      {
+        id: 1,
+        nombre: 'Admin',
+        correo: 'admin@test.com',
+        password: '123456'
+      }
+    ];
+
+    localStorage.setItem(
+      'usuarios',
+      JSON.stringify(usuarioInicial)
+    );
+
+    return usuarioInicial;
+  });
+
+  // CARGAR SESION
+  useEffect(() => {
     const sesionStorage =
       localStorage.getItem('sesion');
 
     if (sesionStorage) {
-
       setUsuario(
         JSON.parse(sesionStorage)
       );
     }
-
   }, []);
 
   // GUARDAR USUARIOS
@@ -149,6 +137,87 @@ export function AuthProvider({
     };
   };
 
+  const actualizarPerfil = (datosActualizados) => {
+    const usuarioActualizado = {
+      ...usuario,
+      ...datosActualizados
+    };
+
+    setUsuario(usuarioActualizado);
+
+    localStorage.setItem(
+      'sesion',
+      JSON.stringify(usuarioActualizado)
+    );
+
+    const usuariosActualizados = usuarios.map((user) =>
+      user.id === usuario.id
+        ? usuarioActualizado
+        : user
+    );
+
+    setUsuarios(usuariosActualizados);
+
+    localStorage.setItem(
+      'usuarios',
+      JSON.stringify(usuariosActualizados)
+    );
+
+    return {
+      ok: true,
+      mensaje: 'Perfil actualizado correctamente'
+    };
+  };
+
+  const actualizarPassword = (
+  passwordActual,
+  nuevaPassword
+) => {
+  if (!usuario) {
+    return {
+      ok: false,
+      mensaje: 'No hay una sesión activa'
+    };
+  }
+
+  if (usuario.password !== passwordActual) {
+    return {
+      ok: false,
+      mensaje: 'La contraseña actual no es correcta'
+    };
+  }
+
+  const usuarioActualizado = {
+      ...usuario,
+      password: nuevaPassword
+    };
+
+    setUsuario(usuarioActualizado);
+
+    localStorage.setItem(
+      'sesion',
+      JSON.stringify(usuarioActualizado)
+    );
+
+    const usuariosActualizados = usuarios.map((user) =>
+      user.id === usuario.id
+        ? usuarioActualizado
+        : user
+    );
+
+    setUsuarios(usuariosActualizados);
+
+    localStorage.setItem(
+      'usuarios',
+      JSON.stringify(usuariosActualizados)
+    );
+
+    return {
+      ok: true,
+      mensaje: 'Contraseña actualizada correctamente'
+    };
+  };
+
   // LOGOUT
   const logout = () => {
 
@@ -165,6 +234,8 @@ export function AuthProvider({
         usuarios,
         register,
         login,
+        actualizarPerfil,
+        actualizarPassword,
         logout
       }}
     >

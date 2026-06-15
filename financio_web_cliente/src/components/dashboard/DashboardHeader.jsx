@@ -1,5 +1,5 @@
 import { useAuth } from '../../context/AuthContext';
-
+import { Link } from 'react-router-dom';
 function DashboardHeader() {
   const { usuario, logout } = useAuth();
 
@@ -8,7 +8,7 @@ function DashboardHeader() {
       <div className="dashboard-header__info">
 
         <h2>
-          Bienvenido {usuario?.nombre || 'Usuario'}
+          Bienvenido <Link to="/profile"> {usuario?.nombre || 'Usuario'}</Link>
         </h2>
 
         <p>
