@@ -4,6 +4,7 @@ import ExpenseChart from '../components/dashboard/ExpenseChart';
 import MovementTable from '../components/dashboard/MovementTable';
 import ExpenseForm from '../components/forms/ExpenseForms';
 import ExpenseFilter from '../components/dashboard/ExpenseFilters';
+import AIRecomendatios from '../components/ia/AIRecomendatios';
 
 import {useState} from 'react';
 
@@ -31,6 +32,7 @@ function Dashboard() {
         categoriaSeleccionada={categoriaSeleccionada}
         tipoSeleccionado={tipoSeleccionado}
       />
+      <AIRecomendatios />
       <MovementTable />
     </main>
   );
