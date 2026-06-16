@@ -15,7 +15,7 @@ function Register() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     setError('');
@@ -36,7 +36,7 @@ function Register() {
       return;
     }
 
-    const resultado = register(nombre, correo, password);
+    const resultado = await register(nombre, correo, password);
 
     if (!resultado.ok) {
       setError(resultado.mensaje);
@@ -46,8 +46,8 @@ function Register() {
     setSuccess('Usuario registrado correctamente');
 
     setTimeout(() => {
-      navigate('/login');
-    }, 1200);
+      navigate('/dashboard');
+    }, 1000);
   };
 
   return (

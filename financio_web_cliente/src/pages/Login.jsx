@@ -11,7 +11,7 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -20,7 +20,7 @@ function Login() {
       return;
     }
 
-    const resultado = login(correo, password);
+    const resultado = await login(correo, password);
 
     if (!resultado.ok) {
       setError(resultado.mensaje);
