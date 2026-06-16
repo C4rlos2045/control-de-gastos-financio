@@ -133,6 +133,26 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const actualizarAvatar = async (archivo) => {
+    try {
+      const data =
+        await perfilApi.actualizarAvatar(archivo);
+
+      setUsuario(data.usuario);
+
+      return {
+        ok: true,
+        mensaje: data.mensaje,
+        usuario: data.usuario
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        mensaje: error.message
+      };
+    }
+  };
+
   const actualizarPassword = async (
     passwordActual,
     nuevaPassword,
@@ -167,6 +187,7 @@ export function AuthProvider({ children }) {
         logout,
         obtenerPerfil,
         actualizarPerfil,
+        actualizarAvatar,
         actualizarPassword
       }}
     >

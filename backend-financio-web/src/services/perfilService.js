@@ -1,4 +1,5 @@
 import { supabase } from '../config/supabaseClient.js';
+import { env } from '../config/env.js';
 import {
     hashearPassword,
     compararPassword
@@ -180,6 +181,93 @@ import {
         ...usuarioActualizado,
         perfil: perfilActualizado
     };
+    };
+
+    export const actualizarAvatarService = async (
+    usuarioId,
+    archivo
+    ) => {
+    if (!archivo) {
+        const error = new Error(
+        'No se recibió ningún archivo'
+        );
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const { data: perfilActual } = await supabase
+        .from('perfiles')
+        .select('avatar_path')
+        .eq('usuario_id', usuarioId)
+        .maybeSingle();
+
+    const extension =
+        archivo.mimetype === 'image/png'
+        ? 'png'
+        : 'jpg';
+
+    const rutaArchivo =
+        `usuarios/${usuarioId}/avatar-${Date.now()}.${extension}`;
+
+    const { error: errorUpload } =
+        await supabase.storage
+        .from(env.avatarBucket)
+        .upload(
+            rutaArchivo,
+            archivo.buffer,
+            {
+            contentType: archivo.mimetype,
+            cacheControl: '3600',
+            upsert: false
+            }
+        );
+
+    if (errorUpload) {
+        throw new Error(
+        'No fue posible subir el avatar'
+        );
+    }
+
+    const { data: publicUrlData } =
+        supabase.storage
+        .from(env.avatarBucket)
+        .getPublicUrl(rutaArchivo);
+
+    const avatarUrl = publicUrlData.publicUrl;
+
+    const { error: errorPerfil } = await supabase
+        .from('perfiles')
+        .upsert(
+        {
+            usuario_id: usuarioId,
+            avatar_url: avatarUrl,
+            avatar_path: rutaArchivo
+        },
+        {
+            onConflict: 'usuario_id'
+        }
+        );
+
+    if (errorPerfil) {
+        await supabase.storage
+        .from(env.avatarBucket)
+        .remove([rutaArchivo]);
+
+        throw new Error(
+        'No fue posible actualizar el perfil con el avatar'
+        );
+    }
+
+    if (
+        perfilActual?.avatar_path &&
+        perfilActual.avatar_path !== rutaArchivo
+    ) {
+        await supabase.storage
+        .from(env.avatarBucket)
+        .remove([perfilActual.avatar_path]);
+    }
+
+    return await obtenerPerfilService(usuarioId);
     };
 
     export const actualizarPasswordService = async (

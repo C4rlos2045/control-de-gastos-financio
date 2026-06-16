@@ -21,7 +21,14 @@
 
     bcryptSaltRounds: Number(
         process.env.BCRYPT_SALT_ROUNDS || 10
-    )
+    ),
+
+    avatarBucket:
+        process.env.AVATAR_BUCKET || 'avatars',
+
+        avatarMaxSizeMb: Number(
+        process.env.AVATAR_MAX_SIZE_MB || 2
+        )
     };
 
     export const validarVariablesEntorno = () => {

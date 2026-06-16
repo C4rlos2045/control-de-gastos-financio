@@ -54,3 +54,42 @@ export const apiRequest = async (
 
   return data;
 };
+
+export const apiFormRequest = async (
+  endpoint,
+  {
+    method = 'POST',
+    body,
+    auth = true
+  } = {}
+) => {
+  const headers = {};
+
+  const token = obtenerToken();
+
+  if (auth && token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await fetch(
+    construirUrl(endpoint),
+    {
+      method,
+      headers,
+      body
+    }
+  );
+
+  const data = await response
+    .json()
+    .catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(
+      data.mensaje ||
+      'Error al conectar con el servidor'
+    );
+  }
+
+  return data;
+};

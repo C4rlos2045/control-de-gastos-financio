@@ -2,44 +2,12 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import '../styles/profile.css';
 
-function AvatarUploader({ avatar, setAvatar }) {
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setAvatar(reader.result);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  return (
-    <div className="avatar-uploader">
-      <label className="avatar-uploader__label">Avatar</label>
-
-      <div className="avatar-uploader__preview">
-        {avatar ? (
-          <img src={avatar} alt="Avatar" />
-        ) : (
-          <span>Sin avatar</span>
-        )}
-      </div>
-
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleAvatarChange}
-      />
-    </div>
-  );
-}
-
 function Profile() {
   const {
     usuario,
     obtenerPerfil,
     actualizarPerfil,
+    actualizarAvatar,
     actualizarPassword
   } = useAuth();
 
@@ -51,11 +19,14 @@ function Profile() {
   const [direccion, setDireccion] = useState('');
   const [curp, setCurp] = useState('');
   const [rfc, setRfc] = useState('');
-  const [avatar, setAvatar] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
 
   const [passwordActual, setPasswordActual] = useState('');
   const [nuevaPassword, setNuevaPassword] = useState('');
   const [confirmarPassword, setConfirmarPassword] = useState('');
+
+  const [archivoAvatar, setArchivoAvatar] = useState(null);
+  const [subiendoAvatar, setSubiendoAvatar] = useState(false);
 
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
@@ -69,7 +40,7 @@ function Profile() {
     setDireccion(perfil.direccion || '');
     setCurp(perfil.curp || '');
     setRfc(perfil.rfc || '');
-    setAvatar(perfil.avatar_url || '');
+    setAvatarUrl(perfil.avatar_url || '');
   };
 
   useEffect(() => {
@@ -110,7 +81,7 @@ function Profile() {
       direccion: direccion.trim(),
       curp: curp.trim().toUpperCase(),
       rfc: rfc.trim().toUpperCase(),
-      avatar
+      avatar_url: avatarUrl.trim()
     });
 
     if (!resultado.ok) {
@@ -120,6 +91,61 @@ function Profile() {
 
     cargarDatosEnFormulario(resultado.usuario);
     setMensaje('Perfil actualizado correctamente');
+  };
+
+  const handleAvatarChange = (e) => {
+    const archivo = e.target.files[0];
+
+    if (!archivo) return;
+
+    const tiposPermitidos = [
+      'image/jpeg',
+      'image/png'
+    ];
+
+    if (!tiposPermitidos.includes(archivo.type)) {
+      setError('Solo se permiten imágenes JPG, JPEG o PNG');
+      return;
+    }
+
+    const limiteMb = 2;
+
+    if (archivo.size > limiteMb * 1024 * 1024) {
+      setError(`La imagen no debe superar ${limiteMb} MB`);
+      return;
+    }
+
+    setArchivoAvatar(archivo);
+    setAvatarUrl(URL.createObjectURL(archivo));
+    setMensaje('');
+    setError('');
+  };
+
+  const handleAvatarSubmit = async () => {
+    setMensaje('');
+    setError('');
+
+    if (!archivoAvatar) {
+      setError('Selecciona una imagen antes de guardar');
+      return;
+    }
+
+    setSubiendoAvatar(true);
+
+    const resultado = await actualizarAvatar(
+      archivoAvatar
+    );
+
+    setSubiendoAvatar(false);
+
+    if (!resultado.ok) {
+      setError(resultado.mensaje);
+      return;
+    }
+
+    cargarDatosEnFormulario(resultado.usuario);
+    setArchivoAvatar(null);
+    setMensaje('Avatar actualizado correctamente');
   };
 
   const handlePasswordSubmit = async (e) => {
@@ -186,7 +212,7 @@ function Profile() {
     );
   }
 
-  return (
+   return (
     <main className="profile-page">
       <section className="profile-card">
         <div className="profile-card__header">
@@ -194,12 +220,10 @@ function Profile() {
             Cuenta de usuario
           </span>
 
-          <h2>
-            Mi perfil
-          </h2>
+          <h2>Mi perfil</h2>
 
           <p>
-            Consulta y actualiza tu información personal.
+            Consulta y actualiza tu información personal desde tu cuenta.
           </p>
         </div>
 
@@ -216,84 +240,157 @@ function Profile() {
         )}
 
         <div className="profile-grid">
-          <AvatarUploader
-            avatar={avatar}
-            setAvatar={setAvatar}
-          />
-
-          <form
-            className="profile-form"
-            onSubmit={handleSubmit}
+          <aside className="profile-avatar-section">
+          <label
+            htmlFor="avatarInput"
+            className="profile-avatar"
           >
-            <div className="profile-field">
-              <label>Nombre de usuario *</label>
-
-              <input
-                type="text"
-                placeholder="Juan Pérez"
-                value={nombre}
-                onChange={(e) =>
-                  setNombre(e.target.value)
-                }
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt="Avatar del usuario"
               />
-            </div>
+            ) : (
+              <span className="profile-avatar__placeholder">
+                👤
+              </span>
+            )}
 
-            <div className="profile-field">
-              <label>Correo electrónico *</label>
-
-              <input
-                type="email"
-                placeholder="correo@ejemplo.com"
-                value={correo}
-                onChange={(e) =>
-                  setCorreo(e.target.value)
-                }
-              />
-            </div>
-            
-            <div className="profile-field">
-          <label>CURP</label>
+            <span className="profile-avatar__overlay">
+              Cambiar foto
+            </span>
+          </label>
 
           <input
-            type="text"
-            placeholder="Ej. AAPJ990101HMCXXX00"
-            value={curp}
-            maxLength={18}
-            onChange={(e) =>
-              setCurp(e.target.value.toUpperCase())
-            }
+            id="avatarInput"
+            type="file"
+            accept="image/png, image/jpeg"
+            onChange={handleAvatarChange}
+            hidden
           />
-        </div>
 
-        <div className="profile-field">
-          <label>RFC</label>
+          <p className="profile-avatar__note">
+            Formatos permitidos: JPG, JPEG o PNG. Máximo 2 MB.
+          </p>
 
-          <input
-            type="text"
-            placeholder="Ej. AAPJ990101XXX"
-            value={rfc}
-            maxLength={13}
-            onChange={(e) =>
-              setRfc(e.target.value.toUpperCase())
-            }
-          />
-</div>
+          <button
+            type="button"
+            className="profile-button profile-button--primary"
+            onClick={handleAvatarSubmit}
+            disabled={subiendoAvatar || !archivoAvatar}
+          >
+            {subiendoAvatar
+              ? 'Subiendo...'
+              : 'Guardar avatar'}
+          </button>
+        </aside>
 
+          <div className="profile-content">
+            <form
+              className="profile-form"
+              onSubmit={handleSubmit}
+            >
+              <div className="profile-field">
+                <label>Nombre *</label>
 
-            <div className="profile-field">
-              <label>Teléfono</label>
+                <input
+                  type="text"
+                  placeholder="Juan Carlos"
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                />
+              </div>
 
-              <input
-                type="tel"
-                placeholder="+52 123 456 7890"
-                value={telefono}
-                onChange={(e) =>
-                  setTelefono(e.target.value)
-                }
-              />
-            </div>
+              <div className="profile-field">
+                <label>Correo electrónico *</label>
 
-            <br></br>
+                <input
+                  type="email"
+                  placeholder="correo@ejemplo.com"
+                  value={correo}
+                  onChange={(e) => setCorreo(e.target.value)}
+                />
+              </div>
+
+              <div className="profile-field">
+                <label>Teléfono</label>
+
+                <input
+                  type="tel"
+                  placeholder="7221234567"
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
+                />
+              </div>
+
+              <div className="profile-field">
+                <label>CURP</label>
+
+                <input
+                  type="text"
+                  placeholder="AAPJ990101HMCXXX00"
+                  value={curp}
+                  maxLength={18}
+                  onChange={(e) =>
+                    setCurp(e.target.value.toUpperCase())
+                  }
+                />
+              </div>
+
+              <div className="profile-field">
+                <label>RFC</label>
+
+                <input
+                  type="text"
+                  placeholder="AAPJ990101XX0"
+                  value={rfc}
+                  maxLength={13}
+                  onChange={(e) =>
+                    setRfc(e.target.value.toUpperCase())
+                  }
+                />
+              </div>
+
+              <div className="profile-field">
+                <label>Avatar URL</label>
+
+                <input
+                  type="text"
+                  placeholder="https://ejemplo.com/avatar.jpg"
+                  value={avatarUrl}
+                  onChange={(e) => setAvatarUrl(e.target.value)}
+                />
+              </div>
+
+              <div className="profile-field profile-field--full">
+                <label>Dirección</label>
+
+                <textarea
+                  rows="3"
+                  placeholder="Calle, colonia, ciudad"
+                  value={direccion}
+                  onChange={(e) => setDireccion(e.target.value)}
+                />
+              </div>
+
+              <div className="profile-actions">
+                <button
+                  type="button"
+                  className="profile-button profile-button--secondary"
+                  onClick={cancelarCambios}
+                >
+                  Cancelar
+                </button>
+
+                <button
+                  type="submit"
+                  className="profile-button profile-button--primary"
+                >
+                  Guardar cambios
+                </button>
+              </div>
+            </form>
+
             <form
               className="password-form"
               onSubmit={handlePasswordSubmit}
@@ -303,9 +400,7 @@ function Profile() {
                   Seguridad
                 </span>
 
-                <h3>
-                  Actualizar contraseña
-                </h3>
+                <h3>Actualizar contraseña</h3>
 
                 <p>
                   Cambia tu contraseña para mantener segura tu cuenta.
@@ -339,7 +434,7 @@ function Profile() {
               </div>
 
               <div className="profile-field">
-                <label>Confirmar nueva contraseña</label>
+                <label>Confirmar contraseña</label>
 
                 <input
                   type="password"
@@ -358,37 +453,7 @@ function Profile() {
                 Actualizar contraseña
               </button>
             </form>
-
-            <div className="profile-field profile-field--full">
-              <label>Dirección</label>
-
-              <textarea
-                rows="3"
-                placeholder="Calle, número, colonia, ciudad"
-                value={direccion}
-                onChange={(e) =>
-                  setDireccion(e.target.value)
-                }
-              />
-            </div>
-
-            <div className="profile-actions">
-              <button
-                type="button"
-                className="profile-button profile-button--secondary"
-                onClick={cancelarCambios}
-              >
-                Cancelar
-              </button>
-
-              <button
-                type="submit"
-                className="profile-button profile-button--primary"
-              >
-                Guardar cambios
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
       </section>
     </main>

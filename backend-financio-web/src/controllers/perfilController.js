@@ -1,7 +1,8 @@
 import {
     obtenerPerfilService,
     actualizarPerfilService,
-    actualizarPasswordService
+    actualizarPasswordService,
+    actualizarAvatarService
     } from '../services/perfilService.js';
 
     export const obtenerPerfil = async (
@@ -37,6 +38,28 @@ import {
         return res.json({
         ok: true,
         mensaje: 'Perfil actualizado correctamente',
+        usuario
+        });
+    } catch (error) {
+        next(error);
+    }
+    };
+
+    export const actualizarAvatar = async (
+    req,
+    res,
+    next
+    ) => {
+    try {
+        const usuario =
+        await actualizarAvatarService(
+            req.usuario.id,
+            req.file
+        );
+
+        return res.json({
+        ok: true,
+        mensaje: 'Avatar actualizado correctamente',
         usuario
         });
     } catch (error) {

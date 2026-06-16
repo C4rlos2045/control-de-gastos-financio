@@ -3,10 +3,12 @@ import { Router } from 'express';
 import {
     obtenerPerfil,
     actualizarPerfil,
-    actualizarPassword
+    actualizarPassword,
+    actualizarAvatar
 } from '../controllers/perfilController.js';
 
 import { protegerRuta } from '../middlewares/authMiddleware.js';
+import { subirAvatar } from '../middlewares/uploadMiddleware.js';
 
 import {
     validarActualizacionPerfil,
@@ -29,6 +31,13 @@ router.put(
     validarActualizacionPerfil,
     validarCampos,
     actualizarPerfil
+);
+
+router.put(
+    '/avatar',
+    protegerRuta,
+    subirAvatar,
+    actualizarAvatar
 );
 
 router.put(

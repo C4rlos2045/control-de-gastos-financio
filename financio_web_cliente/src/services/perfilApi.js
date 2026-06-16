@@ -1,4 +1,4 @@
-import { apiRequest } from './apiClient';
+import { apiRequest, apiFormRequest } from './apiClient';
 
 export const perfilApi = {
   obtenerPerfil: () =>
@@ -9,6 +9,17 @@ export const perfilApi = {
       method: 'PUT',
       body: datos
     }),
+
+  actualizarAvatar: (archivo) => {
+    const formData = new FormData();
+
+    formData.append('avatar', archivo);
+
+    return apiFormRequest('/perfil/avatar', {
+      method: 'PUT',
+      body: formData
+    });
+  },
 
   actualizarPassword: (datos) =>
     apiRequest('/perfil/password', {
