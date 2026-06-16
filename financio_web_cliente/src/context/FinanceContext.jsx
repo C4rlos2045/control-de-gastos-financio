@@ -201,6 +201,7 @@ export function FinanceProvider({ children }) {
 
   useEffect(() => {
     if (!usuario) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMovimientos([]);
       setCategorias([]);
       setResumen(null);
@@ -481,6 +482,7 @@ export function FinanceProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useFinance() {
   return useContext(FinanceContext);
 }

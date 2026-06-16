@@ -1,9 +1,9 @@
 import { Router } from 'express';
 
 import {
-  obtenerResumenFinanciero,
-  obtenerGastosPorCategoria,
-  obtenerMovimientosPorMes
+    obtenerResumenFinanciero,
+    obtenerGastosPorCategoria,
+    obtenerMovimientosPorMes
 } from '../controllers/reportesController.js';
 
 import { protegerRuta } from '../middlewares/authMiddleware.js';
