@@ -495,3 +495,35 @@
   background: #dcfce7;
   color: #15803d;
 }
+
+.table-input {
+  width: 100%;
+  min-width: 120px;
+  padding: 0.55rem 0.7rem;
+
+  border: 1px solid #cbdde9;
+  border-radius: 0.7rem;
+
+  font-size: 0.85rem;
+  color: var(--color-text);
+  background: white;
+}
+
+.table-input:focus {
+  outline: none;
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px rgba(29, 196, 212, 0.15);
+}
+
+.btn-edit {
+  background: transparent;
+  border: none;
+  color: var(--color-primary);
+  font-weight: 700;
+  cursor: pointer;
+  margin-right: 0.6rem;
+}
+
+.btn-edit:hover {
+  text-decoration: underline;
+}

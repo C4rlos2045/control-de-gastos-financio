@@ -351,17 +351,6 @@ function Profile() {
                 />
               </div>
 
-              <div className="profile-field">
-                <label>Avatar URL</label>
-
-                <input
-                  type="text"
-                  placeholder="https://ejemplo.com/avatar.jpg"
-                  value={avatarUrl}
-                  onChange={(e) => setAvatarUrl(e.target.value)}
-                />
-              </div>
-
               <div className="profile-field profile-field--full">
                 <label>Dirección</label>
 
