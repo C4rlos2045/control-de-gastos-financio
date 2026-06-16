@@ -6,7 +6,7 @@ import {
   obtenerMovimientosPorMes
 } from '../controllers/reportesController.js';
 
-import { protegerRuta } from '../middlewares/authMiddleware.js}';
+import { protegerRuta } from '../middlewares/authMiddleware.js';
 import { validarCampos } from '../middlewares/validationMiddleware.js';
 import { validarFiltrosReportes } from '../validators/reportesValidators.js';
 
