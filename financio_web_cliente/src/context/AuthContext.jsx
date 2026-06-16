@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars, react-refresh/only-export-components */
 import {
   createContext,
   useContext,
@@ -96,6 +96,24 @@ export function AuthProvider({ children }) {
     setUsuario(null);
   };
 
+  const obtenerPerfil = async () => {
+    try {
+      const data = await perfilApi.obtenerPerfil();
+
+      setUsuario(data.usuario);
+
+      return {
+        ok: true,
+        usuario: data.usuario
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        mensaje: error.message
+      };
+    }
+  };
+
   const actualizarPerfil = async (datos) => {
     try {
       const data = await perfilApi.actualizarPerfil(datos);
@@ -147,6 +165,7 @@ export function AuthProvider({ children }) {
         register,
         login,
         logout,
+        obtenerPerfil,
         actualizarPerfil,
         actualizarPassword
       }}

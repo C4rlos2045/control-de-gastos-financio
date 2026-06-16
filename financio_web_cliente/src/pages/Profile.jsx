@@ -1,64 +1,109 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import AvatarUploader from '../components/profile/AvatarUploader';
 import '../styles/profile.css';
+
+function AvatarUploader({ avatar, setAvatar }) {
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatar(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <div className="avatar-uploader">
+      <label className="avatar-uploader__label">Avatar</label>
+
+      <div className="avatar-uploader__preview">
+        {avatar ? (
+          <img src={avatar} alt="Avatar" />
+        ) : (
+          <span>Sin avatar</span>
+        )}
+      </div>
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleAvatarChange}
+      />
+    </div>
+  );
+}
 
 function Profile() {
   const {
     usuario,
+    obtenerPerfil,
     actualizarPerfil,
     actualizarPassword
   } = useAuth();
 
-  const [nombre, setNombre] = useState(
-    usuario?.nombre || ''
-  );
+  const [cargando, setCargando] = useState(true);
 
-  const [correo, setCorreo] = useState(
-    usuario?.correo || ''
-  );
+  const [nombre, setNombre] = useState('');
+  const [correo, setCorreo] = useState('');
+  const [telefono, setTelefono] = useState('');
+  const [direccion, setDireccion] = useState('');
+  const [curp, setCurp] = useState('');
+  const [rfc, setRfc] = useState('');
+  const [avatar, setAvatar] = useState('');
 
-  const [telefono, setTelefono] = useState(
-    usuario?.telefono || ''
-  );
-
-  const [curp, setCurp] = useState(
-    usuario?.curp || ''
-  );
-
-  const [rfc, setRfc] = useState(
-    usuario?.rfc || ''
-  );
-
-const [passwordActual, setPasswordActual] = useState('');
-const [nuevaPassword, setNuevaPassword] = useState('');
-const [confirmarPassword, setConfirmarPassword] = useState('');
-
-  const [direccion, setDireccion] = useState(
-    usuario?.direccion || ''
-  );
-
-  const [avatar, setAvatar] = useState(
-    usuario?.avatar || ''
-  );
+  const [passwordActual, setPasswordActual] = useState('');
+  const [nuevaPassword, setNuevaPassword] = useState('');
+  const [confirmarPassword, setConfirmarPassword] = useState('');
 
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const cargarDatosEnFormulario = (datosUsuario) => {
+    const perfil = datosUsuario?.perfil || {};
+
+    setNombre(datosUsuario?.nombre || '');
+    setCorreo(datosUsuario?.correo || '');
+    setTelefono(perfil.telefono || '');
+    setDireccion(perfil.direccion || '');
+    setCurp(perfil.curp || '');
+    setRfc(perfil.rfc || '');
+    setAvatar(perfil.avatar_url || '');
+  };
+
+  useEffect(() => {
+    const cargarPerfil = async () => {
+      setCargando(true);
+      setError('');
+
+      const resultado = await obtenerPerfil();
+
+      if (!resultado.ok) {
+        setError(resultado.mensaje);
+        setCargando(false);
+        return;
+      }
+
+      cargarDatosEnFormulario(resultado.usuario);
+      setCargando(false);
+    };
+
+    cargarPerfil();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     setMensaje('');
     setError('');
 
     if (!nombre.trim() || !correo.trim()) {
-      setError(
-        'El nombre y el correo son obligatorios'
-      );
+      setError('El nombre y el correo son obligatorios');
       return;
     }
 
-    const resultado = actualizarPerfil({
+    const resultado = await actualizarPerfil({
       nombre: nombre.trim(),
       correo: correo.trim(),
       telefono: telefono.trim(),
@@ -68,68 +113,60 @@ const [confirmarPassword, setConfirmarPassword] = useState('');
       avatar
     });
 
-    if (resultado.ok) {
-      setMensaje(resultado.mensaje);
+    if (!resultado.ok) {
+      setError(resultado.mensaje);
+      return;
     }
+
+    cargarDatosEnFormulario(resultado.usuario);
+    setMensaje('Perfil actualizado correctamente');
   };
 
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
 
-  const handlePasswordSubmit = (e) => {
-  e.preventDefault();
+    setMensaje('');
+    setError('');
 
-  setMensaje('');
-  setError('');
+    if (
+      !passwordActual ||
+      !nuevaPassword ||
+      !confirmarPassword
+    ) {
+      setError('Todos los campos de contraseña son obligatorios');
+      return;
+    }
 
-  if (
-    !passwordActual ||
-    !nuevaPassword ||
-    !confirmarPassword
-  ) {
-    setError(
-      'Todos los campos de contraseña son obligatorios'
+    if (nuevaPassword.length < 6) {
+      setError('La nueva contraseña debe tener mínimo 6 caracteres');
+      return;
+    }
+
+    if (nuevaPassword !== confirmarPassword) {
+      setError('La nueva contraseña y su confirmación no coinciden');
+      return;
+    }
+
+    const resultado = await actualizarPassword(
+      passwordActual,
+      nuevaPassword,
+      confirmarPassword
     );
-    return;
-  }
 
-  if (nuevaPassword.length < 6) {
-    setError(
-      'La nueva contraseña debe tener mínimo 6 caracteres'
-    );
-    return;
-  }
+    if (!resultado.ok) {
+      setError(resultado.mensaje);
+      return;
+    }
 
-  if (nuevaPassword !== confirmarPassword) {
-    setError(
-      'La nueva contraseña y su confirmación no coinciden'
-    );
-    return;
-  }
+    setPasswordActual('');
+    setNuevaPassword('');
+    setConfirmarPassword('');
 
-  const resultado = actualizarPassword(
-    passwordActual,
-    nuevaPassword
-  );
-
-  if (!resultado.ok) {
-    setError(resultado.mensaje);
-    return;
-  }
-
-  setMensaje(resultado.mensaje);
-
-  setPasswordActual('');
-  setNuevaPassword('');
-  setConfirmarPassword('');
-};
+    setMensaje('Contraseña actualizada correctamente');
+  };
 
   const cancelarCambios = () => {
-    setNombre(usuario?.nombre || '');
-    setCorreo(usuario?.correo || '');
-    setTelefono(usuario?.telefono || '');
-    setDireccion(usuario?.direccion || '');
-    setCurp(usuario?.curp || '');
-    setRfc(usuario?.rfc || '');
-    setAvatar(usuario?.avatar || '');
+    cargarDatosEnFormulario(usuario);
 
     setPasswordActual('');
     setNuevaPassword('');
@@ -138,6 +175,16 @@ const [confirmarPassword, setConfirmarPassword] = useState('');
     setMensaje('Cambios descartados');
     setError('');
   };
+
+  if (cargando) {
+    return (
+      <main className="profile-page">
+        <section className="profile-card">
+          <p>Cargando perfil...</p>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="profile-page">
