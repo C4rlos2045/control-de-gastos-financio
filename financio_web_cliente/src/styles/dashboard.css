@@ -299,6 +299,11 @@
   }
 }
 
+.btn-save-movement:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 /* MOVEMENTS TABLE */
 
 .movements-card {
@@ -485,4 +490,8 @@
   .filters-card {
     padding: 1.3rem;
   }
+}
+.form-alert--success {
+  background: #dcfce7;
+  color: #15803d;
 }
