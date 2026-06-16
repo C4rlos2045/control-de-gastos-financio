@@ -1,82 +1,24 @@
 import { useState } from 'react';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import SendIcon from '@mui/icons-material/Send';
-import { useFinance } from '../../context/FinanceContext';
+import { iaApi } from '../../services/iaApi';
 import '../../styles/ai.css';
 
 function AIRecommendations() {
-  const { movimientos } = useFinance();
-
   const [abierto, setAbierto] = useState(false);
+
   const [mensajes, setMensajes] = useState([
     {
       tipo: 'bot',
-      texto: 'Hola, soy tu asistente financiero. Puedes pedirme recomendaciones sobre tus gastos, categorías o hábitos de ahorro.'
+      texto:
+        'Hola, soy tu asistente financiero. Puedo analizar tus movimientos reales y darte recomendaciones personalizadas.'
     }
   ]);
+
   const [pregunta, setPregunta] = useState('');
   const [cargando, setCargando] = useState(false);
 
-  const analizarMayorGasto = () => {
-    const gastos = movimientos.filter((mov) => mov.tipo === 'gasto');
-
-    if (gastos.length === 0) {
-      return 'Aún no hay suficientes gastos registrados para generar una recomendación.';
-    }
-
-    const gastosPorCategoria = {};
-
-    gastos.forEach((mov) => {
-      gastosPorCategoria[mov.categoria] =
-        (gastosPorCategoria[mov.categoria] || 0) + Number(mov.monto);
-    });
-
-    const mayorGasto = Object.entries(gastosPorCategoria)
-      .sort((a, b) => b[1] - a[1])[0];
-
-    return `Detecté que tu mayor gasto está en "${mayorGasto[0]}" con un total de $${mayorGasto[1].toFixed(2)}. Te recomiendo establecer un límite semanal para esa categoría.`;
-  };
-
-  const generarRespuesta = (textoUsuario = '') => {
-    setCargando(true);
-
-    setTimeout(() => {
-      let respuesta = '';
-
-      const texto = textoUsuario.toLowerCase();
-
-      if (texto.includes('ahorro') || texto.includes('ahorrar')) {
-        respuesta =
-          'Para mejorar tu ahorro, te recomiendo separar primero un porcentaje fijo de tus ingresos antes de registrar gastos variables.';
-      } else if (texto.includes('gasto') || texto.includes('categoría')) {
-        respuesta = analizarMayorGasto();
-      } else if (texto.includes('saldo') || texto.includes('balance')) {
-        const ingresos = movimientos
-          .filter((mov) => mov.tipo === 'ingreso')
-          .reduce((acc, mov) => acc + Number(mov.monto), 0);
-
-        const gastos = movimientos
-          .filter((mov) => mov.tipo === 'gasto')
-          .reduce((acc, mov) => acc + Number(mov.monto), 0);
-
-        respuesta = `Tu balance actual estimado es de $${(ingresos - gastos).toFixed(2)}. Mantener un saldo positivo constante es una buena señal financiera.`;
-      } else {
-        respuesta = analizarMayorGasto();
-      }
-
-      setMensajes((prev) => [
-        ...prev,
-        {
-          tipo: 'bot',
-          texto: respuesta
-        }
-      ]);
-
-      setCargando(false);
-    }, 800);
-  };
-
-  const manejarOpcion = (texto) => {
+  const agregarMensajeUsuario = (texto) => {
     setMensajes((prev) => [
       ...prev,
       {
@@ -84,8 +26,42 @@ function AIRecommendations() {
         texto
       }
     ]);
+  };
 
-    generarRespuesta(texto);
+  const agregarMensajeBot = (texto) => {
+    setMensajes((prev) => [
+      ...prev,
+      {
+        tipo: 'bot',
+        texto
+      }
+    ]);
+  };
+
+  const solicitarRecomendacion = async (payload) => {
+    try {
+      setCargando(true);
+
+      const data =
+        await iaApi.generarRecomendacion(payload);
+
+      agregarMensajeBot(data.respuesta);
+    } catch (error) {
+      agregarMensajeBot(
+        error.message ||
+          'No fue posible generar la recomendación en este momento.'
+      );
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const manejarOpcion = (opcion, textoVisible) => {
+    agregarMensajeUsuario(textoVisible);
+
+    solicitarRecomendacion({
+      opcion
+    });
   };
 
   const enviarPregunta = (e) => {
@@ -95,16 +71,12 @@ function AIRecommendations() {
 
     const texto = pregunta.trim();
 
-    setMensajes((prev) => [
-      ...prev,
-      {
-        tipo: 'user',
-        texto
-      }
-    ]);
-
+    agregarMensajeUsuario(texto);
     setPregunta('');
-    generarRespuesta(texto);
+
+    solicitarRecomendacion({
+      pregunta: texto
+    });
   };
 
   return (
@@ -139,16 +111,52 @@ function AIRecommendations() {
 
           <div className="ai-chat-window__body">
             <div className="ai-options">
-              <button onClick={() => manejarOpcion('Analiza mis gastos')}>
+              <button
+                onClick={() =>
+                  manejarOpcion(
+                    'analizar_gastos',
+                    'Analiza mis gastos'
+                  )
+                }
+                disabled={cargando}
+              >
                 Analiza mis gastos
               </button>
 
-              <button onClick={() => manejarOpcion('Dame recomendaciones de ahorro')}>
+              <button
+                onClick={() =>
+                  manejarOpcion(
+                    'recomendaciones_ahorro',
+                    'Dame recomendaciones de ahorro'
+                  )
+                }
+                disabled={cargando}
+              >
                 Recomendaciones de ahorro
               </button>
 
-              <button onClick={() => manejarOpcion('Revisa mi balance')}>
+              <button
+                onClick={() =>
+                  manejarOpcion(
+                    'revisar_balance',
+                    'Revisa mi balance'
+                  )
+                }
+                disabled={cargando}
+              >
                 Revisar balance
+              </button>
+
+              <button
+                onClick={() =>
+                  manejarOpcion(
+                    'riesgo_financiero',
+                    'Detecta riesgo financiero'
+                  )
+                }
+                disabled={cargando}
+              >
+                Riesgo financiero
               </button>
             </div>
 
@@ -168,7 +176,7 @@ function AIRecommendations() {
 
               {cargando && (
                 <div className="ai-message ai-message--loading">
-                  Analizando información...
+                  Consultando DeepSeek y analizando tus movimientos...
                 </div>
               )}
             </div>
@@ -182,10 +190,16 @@ function AIRecommendations() {
               type="text"
               placeholder="Escribe tu duda financiera..."
               value={pregunta}
-              onChange={(e) => setPregunta(e.target.value)}
+              onChange={(e) =>
+                setPregunta(e.target.value)
+              }
+              disabled={cargando}
             />
 
-            <button type="submit">
+            <button
+              type="submit"
+              disabled={cargando}
+            >
               <SendIcon fontSize="small" />
             </button>
           </form>

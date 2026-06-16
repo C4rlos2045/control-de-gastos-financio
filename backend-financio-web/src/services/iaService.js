@@ -1,6 +1,7 @@
-import { supabase } from '../config/supabaseClient.js';
+    import { supabase } from '../config/supabaseClient.js';
+    import { env } from '../config/env.js';
 
-const seleccionarMovimientoIA = `
+    const seleccionarMovimientoIA = `
     id,
     tipo,
     descripcion,
@@ -22,7 +23,8 @@ const seleccionarMovimientoIA = `
         .from('movimientos')
         .select(seleccionarMovimientoIA)
         .eq('usuario_id', usuarioId)
-        .order('fecha', { ascending: false });
+        .order('fecha', { ascending: false })
+        .limit(80);
 
     if (error) {
         throw new Error(
@@ -33,7 +35,7 @@ const seleccionarMovimientoIA = `
     return data || [];
     };
 
-    const generarResumen = (movimientos) => {
+    const generarResumenFinanciero = (movimientos) => {
     const ingresos = movimientos.filter(
         (mov) => mov.tipo === 'ingreso'
     );
@@ -54,236 +56,237 @@ const seleccionarMovimientoIA = `
 
     const balance = totalIngresos - totalGastos;
 
-    return {
-        totalMovimientos: movimientos.length,
-        totalIngresos,
-        totalGastos,
-        balance,
-        cantidadIngresos: ingresos.length,
-        cantidadGastos: gastos.length
-    };
-};
-
-const obtenerGastosPorCategoria = (movimientos) => {
-    const gastos = movimientos.filter(
-        (mov) => mov.tipo === 'gasto'
-    );
-
-    const agrupacion = {};
+    const gastosPorCategoria = {};
 
     gastos.forEach((mov) => {
         const categoria =
         mov.categorias?.nombre || 'Sin categoría';
 
-        if (!agrupacion[categoria]) {
-        agrupacion[categoria] = {
+        if (!gastosPorCategoria[categoria]) {
+        gastosPorCategoria[categoria] = {
             categoria,
             total: 0,
             cantidad: 0
         };
         }
 
-        agrupacion[categoria].total += Number(mov.monto);
-        agrupacion[categoria].cantidad += 1;
+        gastosPorCategoria[categoria].total += Number(mov.monto);
+        gastosPorCategoria[categoria].cantidad += 1;
     });
 
-    return Object.values(agrupacion).sort(
+    const categoriasOrdenadas =
+        Object.values(gastosPorCategoria).sort(
         (a, b) => b.total - a.total
-    );
-};
+        );
 
-const analizarGastos = (movimientos) => {
-    const resumen = generarResumen(movimientos);
-    const gastosPorCategoria =
-        obtenerGastosPorCategoria(movimientos);
+    return {
+        total_movimientos: movimientos.length,
+        total_ingresos: Number(formatearDinero(totalIngresos)),
+        total_gastos: Number(formatearDinero(totalGastos)),
+        balance: Number(formatearDinero(balance)),
+        cantidad_ingresos: ingresos.length,
+        cantidad_gastos: gastos.length,
+        porcentaje_gastos_sobre_ingresos:
+        totalIngresos > 0
+            ? Number(
+                formatearDinero(
+                (totalGastos / totalIngresos) * 100
+                )
+            )
+            : 0,
+        categoria_mayor_gasto:
+        categoriasOrdenadas.length > 0
+            ? {
+                categoria: categoriasOrdenadas[0].categoria,
+                total: Number(
+                formatearDinero(categoriasOrdenadas[0].total)
+                ),
+                cantidad: categoriasOrdenadas[0].cantidad
+            }
+            : null,
+        gastos_por_categoria: categoriasOrdenadas.map(
+        (item) => ({
+            categoria: item.categoria,
+            total: Number(formatearDinero(item.total)),
+            cantidad: item.cantidad
+        })
+        )
+    };
+    };
 
-    if (resumen.cantidadGastos === 0) {
-        return 'Aún no tienes gastos registrados. Cuando registres algunos movimientos, podré analizar en qué categorías estás gastando más.';
-    }
+    const obtenerPreguntaPorOpcion = (opcion) => {
+    const opciones = {
+        analizar_gastos:
+        'Analiza mis gastos y dime en qué categoría estoy gastando más.',
 
-    const mayorCategoria = gastosPorCategoria[0];
+        recomendaciones_ahorro:
+        'Dame recomendaciones de ahorro personalizadas con base en mis ingresos y gastos.',
 
-    return `Tu mayor gasto se concentra en la categoría "${mayorCategoria.categoria}", con un total de $${formatearDinero(mayorCategoria.total)}. Te recomiendo revisar si esos gastos son necesarios, establecer un límite semanal y comparar este comportamiento con tus ingresos actuales.`;
-};
+        revisar_balance:
+        'Revisa mi balance financiero y dime si mi situación es positiva o negativa.',
 
-const recomendarAhorro = (movimientos) => {
-    const resumen = generarResumen(movimientos);
+        riesgo_financiero:
+        'Detecta si tengo riesgo financiero y explícame qué debería mejorar.'
+    };
 
-    if (resumen.totalIngresos === 0) {
-        return 'Aún no tienes ingresos registrados. Para darte una recomendación de ahorro más precisa, primero registra al menos un ingreso.';
-    }
+    return opciones[opcion] || opciones.analizar_gastos;
+    };
 
-    const porcentajeGasto =
-        (resumen.totalGastos / resumen.totalIngresos) * 100;
+    const prepararMovimientosParaIA = (movimientos) => {
+    return movimientos.slice(0, 40).map((mov) => ({
+        tipo: mov.tipo,
+        descripcion: mov.descripcion,
+        monto: Number(mov.monto),
+        fecha: mov.fecha,
+        categoria: mov.categorias?.nombre || 'Sin categoría'
+    }));
+    };
 
-    if (porcentajeGasto >= 80) {
-        return `Tus gastos representan aproximadamente el ${porcentajeGasto.toFixed(2)}% de tus ingresos. Esto es alto, por lo que te recomiendo reducir gastos variables y separar una cantidad fija para ahorro antes de realizar nuevos gastos.`;
-    }
+    const construirPromptSistema = () => {
+    return `
+    Eres un asistente financiero dentro de una aplicación llamada Financio.
+    Tu tarea es generar recomendaciones claras, útiles y prudentes sobre ingresos, gastos, ahorro y balance personal.
 
-    if (porcentajeGasto >= 50) {
-        return `Tus gastos representan aproximadamente el ${porcentajeGasto.toFixed(2)}% de tus ingresos. Vas en un punto intermedio: podrías aplicar una meta de ahorro del 10% al 20% de tus ingresos.`;
-    }
+    Reglas obligatorias:
+    - Responde siempre en español.
+    - Usa únicamente la información financiera proporcionada.
+    - No inventes movimientos, ingresos, gastos ni datos del usuario.
+    - No pidas CURP, RFC, contraseñas, correo ni datos sensibles.
+    - No digas que guardaste información.
+    - No des asesoría de inversión especializada.
+    - No prometas resultados financieros.
+    - Sé concreto, amable y práctico.
+    - Si no hay datos suficientes, dilo claramente.
+    - Devuelve una respuesta breve, entre 1 y 3 párrafos.
+    - Puedes incluir máximo 3 recomendaciones puntuales.
+    `;
+    };
 
-    return `Tus gastos representan aproximadamente el ${porcentajeGasto.toFixed(2)}% de tus ingresos. Tu situación parece saludable; podrías aumentar tu ahorro o destinar una parte a inversión o fondo de emergencia.`;
-};
-
-const revisarBalance = (movimientos) => {
-    const resumen = generarResumen(movimientos);
-
-    if (resumen.totalMovimientos === 0) {
-        return 'Aún no hay movimientos registrados para calcular tu balance financiero.';
-    }
-
-    if (resumen.balance > 0) {
-        return `Tu balance actual es positivo: $${formatearDinero(resumen.balance)}. Esto indica que tus ingresos superan tus gastos. Mantén este comportamiento y procura asignar parte del excedente al ahorro.`;
-    }
-
-    if (resumen.balance < 0) {
-        return `Tu balance actual es negativo: -$${formatearDinero(Math.abs(resumen.balance))}. Esto indica que tus gastos superan tus ingresos. Te recomiendo revisar tus gastos principales y reducir los menos necesarios.`;
-    }
-
-    return 'Tu balance actual está en cero. Esto significa que tus ingresos y gastos están equilibrados, pero sería recomendable generar un margen de ahorro.';
-};
-
-const detectarRiesgoFinanciero = (movimientos) => {
-    const resumen = generarResumen(movimientos);
-
-    if (resumen.totalIngresos === 0 && resumen.totalGastos > 0) {
-        return 'Existe un posible riesgo financiero porque tienes gastos registrados, pero no ingresos. Registra tus ingresos para obtener un análisis más completo.';
-    }
-
-    if (resumen.totalIngresos === 0) {
-        return 'No hay información suficiente para detectar riesgo financiero. Registra ingresos y gastos para realizar el análisis.';
-    }
-
-    const porcentajeGasto =
-        (resumen.totalGastos / resumen.totalIngresos) * 100;
-
-    if (porcentajeGasto >= 90) {
-        return `Riesgo financiero alto: tus gastos representan el ${porcentajeGasto.toFixed(2)}% de tus ingresos. Es importante reducir gastos no prioritarios y establecer límites por categoría.`;
-    }
-
-    if (porcentajeGasto >= 70) {
-        return `Riesgo financiero medio: tus gastos representan el ${porcentajeGasto.toFixed(2)}% de tus ingresos. Aún hay margen de mejora, especialmente si identificas gastos variables que puedan reducirse.`;
-    }
-
-    return `Riesgo financiero bajo: tus gastos representan el ${porcentajeGasto.toFixed(2)}% de tus ingresos. Tu situación parece estable, aunque conviene mantener hábitos de ahorro.`;
-};
-
-const responderPregunta = (
-  pregunta,
-  movimientos
-) => {
-  const texto = pregunta.toLowerCase();
-
-  if (
-    texto.includes('gasto') ||
-    texto.includes('categoría') ||
-    texto.includes('categoria') ||
-    texto.includes('donde gasto') ||
-    texto.includes('en qué gasto')
-  ) {
-    return analizarGastos(movimientos);
-  }
-
-  if (
-    texto.includes('ahorro') ||
-    texto.includes('ahorrar') ||
-    texto.includes('recomienda')
-  ) {
-    return recomendarAhorro(movimientos);
-  }
-
-  if (
-    texto.includes('balance') ||
-    texto.includes('saldo') ||
-    texto.includes('dinero disponible')
-  ) {
-    return revisarBalance(movimientos);
-  }
-
-  if (
-    texto.includes('riesgo') ||
-    texto.includes('problema') ||
-    texto.includes('mal') ||
-    texto.includes('deuda')
-    ) {
-    return detectarRiesgoFinanciero(movimientos);
-    }
-
-    return `Con base en tus movimientos registrados, puedo ayudarte a revisar tus gastos, analizar tu balance, detectar riesgos financieros o darte recomendaciones de ahorro. Por ahora, ${analizarGastos(movimientos)}`;
-};
-
-const generarRespuestaPorOpcion = (
-    opcion,
+    const construirPromptUsuario = ({
+    pregunta,
+    resumen,
     movimientos
-) => {
-    switch (opcion) {
-        case 'analizar_gastos':
-        return analizarGastos(movimientos);
+    }) => {
+    return `
+    Pregunta del usuario:
+    ${pregunta}
 
-        case 'recomendaciones_ahorro':
-        return recomendarAhorro(movimientos);
+    Resumen financiero calculado por el sistema:
+    ${JSON.stringify(resumen, null, 2)}
 
-        case 'revisar_balance':
-        return revisarBalance(movimientos);
+    Últimos movimientos financieros:
+    ${JSON.stringify(movimientos, null, 2)}
 
-        case 'riesgo_financiero':
-        return detectarRiesgoFinanciero(movimientos);
+    Genera una recomendación personalizada con base en estos datos.
+    `;
+    };
 
-        default:
-        return analizarGastos(movimientos);
+    const llamarDeepSeek = async ({
+    pregunta,
+    resumen,
+    movimientos,
+    usuarioId
+    }) => {
+    const response = await fetch(
+        `${env.deepseekApiUrl}/chat/completions`,
+        {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${env.deepseekApiKey}`
+        },
+        body: JSON.stringify({
+            model: env.deepseekModel,
+            messages: [
+            {
+                role: 'system',
+                content: construirPromptSistema()
+            },
+            {
+                role: 'user',
+                content: construirPromptUsuario({
+                pregunta,
+                resumen,
+                movimientos
+                })
+            }
+            ],
+            stream: false,
+            max_tokens: env.deepseekMaxTokens,
+            temperature: env.deepseekTemperature,
+            user_id: usuarioId
+        })
+        }
+    );
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+        const mensaje =
+        data?.error?.message ||
+        'No fue posible obtener respuesta de DeepSeek';
+
+        const error = new Error(mensaje);
+        error.statusCode = 502;
+        throw error;
     }
-};
 
-export const generarRecomendacionIAService = async (
+    const respuesta =
+        data?.choices?.[0]?.message?.content;
+
+    if (!respuesta) {
+        const error = new Error(
+        'DeepSeek no devolvió una respuesta válida'
+        );
+        error.statusCode = 502;
+        throw error;
+    }
+
+    return {
+        respuesta,
+        modelo: data.model || env.deepseekModel,
+        usage: data.usage || null
+    };
+    };
+
+    export const generarRecomendacionIAService = async (
     usuarioId,
     datos
     ) => {
     const movimientos =
         await obtenerMovimientosUsuario(usuarioId);
 
-    const resumen = generarResumen(movimientos);
-    const gastosPorCategoria =
-        obtenerGastosPorCategoria(movimientos);
+    const resumen =
+        generarResumenFinanciero(movimientos);
 
-    let respuesta;
+    const movimientosParaIA =
+        prepararMovimientosParaIA(movimientos);
 
-    if (datos.pregunta) {
-        respuesta = responderPregunta(
-        datos.pregunta,
-        movimientos
-        );
-    } else {
-        respuesta = generarRespuestaPorOpcion(
-        datos.opcion,
-        movimientos
-        );
-    }
+    const pregunta =
+        datos.pregunta?.trim() ||
+        obtenerPreguntaPorOpcion(datos.opcion);
+
+    const resultadoDeepSeek =
+        await llamarDeepSeek({
+        pregunta,
+        resumen,
+        movimientos: movimientosParaIA,
+        usuarioId
+        });
 
     return {
-        respuesta,
+        respuesta: resultadoDeepSeek.respuesta,
+        modelo: resultadoDeepSeek.modelo,
+        usage: resultadoDeepSeek.usage,
         analisis: {
-        total_movimientos: resumen.totalMovimientos,
-        total_ingresos: Number(
-            formatearDinero(resumen.totalIngresos)
-        ),
-        total_gastos: Number(
-            formatearDinero(resumen.totalGastos)
-        ),
-        balance: Number(
-            formatearDinero(resumen.balance)
-        ),
+        total_movimientos: resumen.total_movimientos,
+        total_ingresos: resumen.total_ingresos,
+        total_gastos: resumen.total_gastos,
+        balance: resumen.balance,
+        porcentaje_gastos_sobre_ingresos:
+            resumen.porcentaje_gastos_sobre_ingresos,
         categoria_mayor_gasto:
-            gastosPorCategoria.length > 0
-            ? {
-                categoria: gastosPorCategoria[0].categoria,
-                total: Number(
-                    formatearDinero(gastosPorCategoria[0].total)
-                ),
-                cantidad: gastosPorCategoria[0].cantidad
-                }
-            : null
+            resumen.categoria_mayor_gasto
         }
     };
-};
+    };

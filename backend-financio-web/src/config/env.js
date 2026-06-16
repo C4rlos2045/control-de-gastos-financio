@@ -23,6 +23,22 @@
         process.env.BCRYPT_SALT_ROUNDS || 10
     ),
 
+    deepseekApiKey: process.env.DEEPSEEK_API_KEY,
+
+    deepseekApiUrl:
+    process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com',
+
+    deepseekModel:
+    process.env.DEEPSEEK_MODEL || 'deepseek-chat',
+
+    deepseekMaxTokens: Number(
+    process.env.DEEPSEEK_MAX_TOKENS || 450
+    ),
+
+    deepseekTemperature: Number(
+    process.env.DEEPSEEK_TEMPERATURE || 0.4
+    ),
+
     avatarBucket:
         process.env.AVATAR_BUCKET || 'avatars',
 
@@ -35,7 +51,8 @@
     const variablesRequeridas = [
         'SUPABASE_URL',
         'SUPABASE_SERVICE_ROLE_KEY',
-        'JWT_SECRET'
+        'JWT_SECRET',
+        'DEEPSEEK_API_KEY'
     ];
 
     const variablesFaltantes =
