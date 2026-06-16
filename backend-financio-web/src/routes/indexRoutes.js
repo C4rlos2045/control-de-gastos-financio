@@ -5,6 +5,7 @@ import perfilRoutes from './perfilRoutes.js';
 import movimientosRoutes from './movimientosRoutes.js';
 import categoriasRoutes from './categoriasRoutes.js';
 import reportesRoutes from './reportesRoutes.js';
+import iaRoutes from './iaRoutes.js';
 
 
 const router = Router();
@@ -15,4 +16,5 @@ router.use('/perfil', perfilRoutes);
 router.use('/movimientos', movimientosRoutes);
 router.use('/categorias', categoriasRoutes);
 router.use('/reportes', reportesRoutes);
+router.use('/ia', iaRoutes);
 export default router;
